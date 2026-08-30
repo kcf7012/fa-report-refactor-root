@@ -14,6 +14,19 @@ from .suggestion import (
     Priority,
     Suggestion,
 )
+from .template import (
+    BUILTIN_TEMPLATES,
+    BASIC_INFO_TEMPLATE,
+    ColorTheme,
+    EXECUTIVE_SUMMARY_TEMPLATE,
+    PREVENTION_OVERVIEW_TEMPLATE,
+    ROOT_CAUSE_5_WHY_TEMPLATE,
+    ROOT_CAUSE_STATISTICAL_TEMPLATE,
+    SlideTemplate,
+    TemplateSection,
+    TemplateValidationError,
+    VisualElement,
+)
 
 __all__ = [
     "Dimension",
@@ -26,4 +39,16 @@ __all__ = [
     "Improvement",
     "Priority",
     "Suggestion",
+    # Template
+    "SlideTemplate",
+    "TemplateSection",
+    "TemplateValidationError",
+    "VisualElement",
+    "ColorTheme",
+    "BUILTIN_TEMPLATES",
+    "BASIC_INFO_TEMPLATE",
+    "ROOT_CAUSE_5_WHY_TEMPLATE",
+    "ROOT_CAUSE_STATISTICAL_TEMPLATE",
+    "PREVENTION_OVERVIEW_TEMPLATE",
+    "EXECUTIVE_SUMMARY_TEMPLATE",
 ]
