@@ -1,7 +1,44 @@
 # FA Report 專案文件索引
 
-> **目的**:讓任何 Agent 或開發者進入此專案時,能快速找到需要的文件
+> **目的**:所有開發文件集中於此資料夾,方便日後查找與版本管理
 > **目標讀者**:外部 Coding Agent、文件 Agent、評估 Agent、開發者
+
+---
+
+## 📂 docs/ 結構與索引
+
+### 【 評估/設計文件】11 份
+
+| 檔案 | 內容 |
+|------|------|
+| `00_executive_summary.md` | 一句話總結 + 三件最重要的事 |
+| `01_assessment.md` | 完整評估(20 個問題分級) |
+| `02_refactor_plan.md` | 5 階段重構計畫 |
+| `03_design_comparison.md` | v2.3 vs v3.0 視覺對比 |
+| `04_summary_design.md` | Summary 拆解設計 |
+| `05_prevention_design.md` | 改善對策拆解設計 |
+| `06_expansion_patterns.md` | 通用展開模式 |
+| `07_llm_agent.md` | LLM Agent + Coding Agent 風格 |
+| `08_uv_integration.md` | uv 套件管理 |
+| `09_improvement_coverage.md` | 6 維度改善覆蓋率分析 |
+| `VISION.md` | 智慧化願景核心 |
+
+### 【 Phase 計畫/進度】5 份
+
+| 檔案 | 對應 Phase |
+|------|-----------|
+| `PHASE2_TODO.md` | Phase 2: 樣板系統 |
+| `PHASE3_TODO.md` | Phase 3: LLM Client + .env |
+| `PHASE4_TODO.md` | Phase 4: 視覺元素 |
+| `PHASE4_5_TODO.md` | Phase 4.5: 補齊 3 個維度 |
+| `PHASE5_TODO.md` | Phase 5: 最終發布 |
+
+### 【 開發規範】2 份
+
+| 檔案 | 內容 |
+|------|------|
+| `README.md` | 本檔(完整索引) |
+| `TESTING.md` | 測試規範(AAA 模式、母片保護、覆蓋率目標) |
 
 ---
 
@@ -19,23 +56,16 @@
 │   ├── examples/                           # 自訂樣板範例
 │   ├── pyproject.toml                      # 套件設定
 │   ├── .python-version                     # Python 3.10
-│   └── .env.example                       # 環境變數範例
+│   ├── .env.example                       # 環境變數範例
+│   ├── CHANGELOG.md                       # 變更記錄
+│   └── .github/workflows/test.yml         # CI/CD
 │   ↑ 本資料來不納入根倉庫 git(有自己的版控)
 │
-├── docs/                                   # ★ 專案評估與設計文件
-│   ├── README.md (本檔)
-│   ├── 00_executive_summary.md             # 三件最重要的事
-│   ├── VISION.md                           # 智慧化願景
-│   ├── TESTING.md                          # 測試規範
-│   ├── 01_assessment.md                    # 問題評估
-│   ├── 02_refactor_plan.md                 # 重構計畫
-│   ├── 03_design_comparison.md             # 視覺設計對比
-│   ├── 04_summary_design.md                # Summary 設計
-│   ├── 05_prevention_design.md             # 改善對策設計
-│   ├── 06_expansion_patterns.md            # 通用展開模式
-│   ├── 07_llm_agent.md                     # Agent 設計
-│   ├── 08_uv_integration.md                # uv 套件管理
-│   └── 09_improvement_coverage.md          # 改善覆蓋率分析
+├── docs/                                   # ★ 專案評估與設計文件(18 份)
+│   ├── README.md (本檔)                    # 完整索引
+│   ├── 00-09 + VISION.md                  # 評估/設計
+│   ├── PHASE2-5_TODO.md                    # Phase 計畫
+│   └── TESTING.md                          # 開發規範
 │
 └── report/                                 # FA 報告與評估 JSON
     ├── *.pptx                              # 原始報告
@@ -50,7 +80,7 @@
 | 倉庫 | 位置 | 追蹤內容 | 對象 |
 |------|------|---------|------|
 | 根倉庫 | `/home/elan/fa-report/` | docs/ + report/ | 外部 Agent、評估者 |
-| 技能包倉庫 | `.agents/skills/fa-report-improvement/` | SKILL.md + scripts/ + references/ | 技能包使用者、開發者 |
+| 技能包倉庫 | `.agents/skills/fa-report-improvement/` | SKILL.md + src/ + tests/ | 技能包使用者、開發者 |
 
 **為何分開?**技能包未來可能:
 - 獨立打包分發給其他團隊
@@ -78,6 +108,12 @@
 - 投影片展開 → `06_expansion_patterns.md`
 - Summary 強化 → `04_summary_design.md`
 - 改善對策 → `05_prevention_design.md`
+
+### 如果你想知道目前 Phase 進度
+→ 看 `PHASE{n}_TODO.md`(對應 Phase)
+
+### 如果你想知道測試規範
+→ 看 `TESTING.md`
 
 ### 如果你是 Coding Agent 接手開發
 → 依序看:`00_executive_summary.md` → `VISION.md` → `02_refactor_plan.md` → 對應功能文件
