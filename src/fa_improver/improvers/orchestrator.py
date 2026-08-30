@@ -19,12 +19,18 @@ from .basic_info import add_basic_info_slide
 from .prevention import add_prevention_measures_slide
 from .root_cause import add_statistical_analysis_slide
 from .summary import enhance_summary_section
+from .problem_definition import add_problem_definition_slide
+from .analysis_method import add_analysis_method_slide
+from .evidence_checklist import add_evidence_checklist_slide
 
 
 class SlideAction(str, Enum):
     """可執行的改善動作"""
 
     ADD_BASIC_INFO = "add_basic_info"
+    ADD_PROBLEM_DEFINITION = "add_problem_definition"
+    ADD_ANALYSIS_METHOD = "add_analysis_method"
+    ADD_EVIDENCE_CHECKLIST = "add_evidence_checklist"
     ADD_ROOT_CAUSE_5_WHY = "add_5_why"
     ADD_ROOT_CAUSE_CONTROL_GROUP = "add_control_group"
     ADD_ROOT_CAUSE_EVIDENCE = "add_evidence"
@@ -67,6 +73,9 @@ class ImprovementOrchestrator:
     # 各維度觸發改善的閾值
     TRIGGER_THRESHOLDS = {
         Dimension.BASIC_INFO: 80,
+        Dimension.PROBLEM_DEF: 70,
+        Dimension.METHOD: 70,
+        Dimension.EVIDENCE: 70,
         Dimension.ROOT_CAUSE: 80,
         Dimension.PREVENTION: 85,
     }
@@ -86,6 +95,27 @@ class ImprovementOrchestrator:
             plan.add(
                 SlideAction.ADD_BASIC_INFO,
                 f"基本資訊分數 {self._score(Dimension.BASIC_INFO)} < 80",
+            )
+
+        # 問題描述與定義
+        if self._needs_improvement(Dimension.PROBLEM_DEF):
+            plan.add(
+                SlideAction.ADD_PROBLEM_DEFINITION,
+                f"問題描述分數 {self._score(Dimension.PROBLEM_DEF)} < 70",
+            )
+
+        # 分析方法與流程
+        if self._needs_improvement(Dimension.METHOD):
+            plan.add(
+                SlideAction.ADD_ANALYSIS_METHOD,
+                f"分析方法分數 {self._score(Dimension.METHOD)} < 70",
+            )
+
+        # 數據與證據支持
+        if self._needs_improvement(Dimension.EVIDENCE):
+            plan.add(
+                SlideAction.ADD_EVIDENCE_CHECKLIST,
+                f"數據證據分數 {self._score(Dimension.EVIDENCE)} < 70",
             )
 
         # 根因分析(嚴重度決定展開數量)
@@ -155,6 +185,15 @@ class ImprovementOrchestrator:
                 evaluation=self.evaluation,
                 filename_info=self.filename_info,
             )
+        elif action == SlideAction.ADD_PROBLEM_DEFINITION:
+            dim = self.evaluation.dimension_dict.get(Dimension.PROBLEM_DEF)
+            add_problem_definition_slide(prs, self.evaluation, dim)
+        elif action == SlideAction.ADD_ANALYSIS_METHOD:
+            dim = self.evaluation.dimension_dict.get(Dimension.METHOD)
+            add_analysis_method_slide(prs, self.evaluation, dim)
+        elif action == SlideAction.ADD_EVIDENCE_CHECKLIST:
+            dim = self.evaluation.dimension_dict.get(Dimension.EVIDENCE)
+            add_evidence_checklist_slide(prs, self.evaluation, dim)
         elif action == SlideAction.ADD_ROOT_CAUSE_5_WHY:
             add_statistical_analysis_slide(
                 prs,
