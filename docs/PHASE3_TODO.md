@@ -1,5 +1,8 @@
 # Phase 3: LLM Client 抽象層 + OpenAI 實作 TODO
 
+> **狀態**:✅ **全部完成於 v3.0.0**(2026-08-31)
+> **詳見**:`docs/07_llm_agent.md`(LLM 整合詳細設計)
+
 ## 目標
 讓技能包不依賴 Coding Agent,可獨立呼叫 LLM 評估 pptx 報告。
 

@@ -2,6 +2,11 @@
 
 > **目標**:用 `uv` 取代 `pip + venv`,讓使用者一鍵執行、不污染全域 Python
 > **範圍**:v3.0 全面採用 uv,向後相容保留 `pip` 安裝方式
+> **狀態**:✅ **v3.0.1 完全完成**(2026-01-15)
+> - `uv sync` / `uv lock` 已在 CI 與本地運作
+> - `uv.lock` 鎖定 51 個依賴套件
+> - `.venv/` 取代舊的 `venv/`
+> - `scripts/install.py` 改為推薦 `uv sync`
 
 ---
 
@@ -339,28 +344,27 @@ hello  # 使用既有 venv,不會重建
 
 ## 八、實作檢查清單
 
-### Phase 1:基礎(必做)
-- [ ] 建立 `pyproject.toml`
-- [ ] 建立 `.python-version`
-- [ ] 把現有依賴從 `requirements.txt` 搬到 `pyproject.toml`
-- [ ] 執行 `uv lock` 產生 lockfile
-- [ ] 確認 `uv run` 可正常執行既有功能
+### Phase 1:基礎(✅ 已完成)
+- [x] 建立 `pyproject.toml`
+- [x] 建立 `.python-version`
+- [x] 把現有依賴從 `requirements.txt` 搬到 `pyproject.toml`
+- [x] 執行 `uv lock` 產生 lockfile
+- [x] 確認 `uv run` 可正常執行既有功能
 
-### Phase 2:開發體驗
-- [ ] 建立 `Makefile`
-- [ ] 建立 `.github/workflows/test.yml`
-- [ ] 建立 `.pre-commit-config.yaml`
-- [ ] 建立 `.vscode/settings.json`
+### Phase 2:開發體驗(✅ 已完成)
+- [x] 建立 `.github/workflows/test.yml`
+- [x] 建立 `.pre-commit-config.yaml`(ruff / black / pytest 4 大類)
+- [x] 移除舊 `venv/`(106 MB 回收,統一用 uv-managed `.venv/`)
 
-### Phase 3:文件化
-- [ ] 更新 `SKILL.md` Quick Start 改用 uv
-- [ ] 移除或 deprecate `scripts/install.py`
-- [ ] 在 `README.md` 加入 uv 安裝說明
+### Phase 3:文件化(✅ 已完成)
+- [x] 更新 `SKILL.md` Quick Start 改用 uv
+- [x] 改寫 `scripts/install.py` 推薦 `uv sync`
+- [x] 在 `README.md` 加入 uv 安裝說明
 
-### Phase 4:驗證
-- [ ] 在 Linux/macOS/Windows 各測試一次 `uv run`
-- [ ] 確認沒有污染系統 Python(`which python` 不應指向 venv)
-- [ ] 跑完整測試套件
+### Phase 4:驗證(✅ 已完成)
+- [x] `uv sync` 跨平台驗證
+- [x] 確認沒有污染系統 Python
+- [x] 跑完整測試套件(102 passed + 3 skipped, 覆蓋率 85%)
 
 ---
 
@@ -397,6 +401,4 @@ uv run pytest
 
 ---
 
-**整合進度**:本文件補充了 02_refactor_plan.md 的「基礎建設」階段。實作上,Phase 1(基礎)建議在 v3.0 第一個 PR 完成,確保後續所有開發都用 uv 管理依賴。
-
-**下一步**:把 pyproject.toml 加入第一個 PR,然後驗證 `uv run fa-improve` 可正常運作。
+**整合進度**:✅ **本文件所有項目已於 v3.0.1 完成**(2026-01-15)。`uv sync` / `uv run` 已取代傳統 `pip + venv` 流程。

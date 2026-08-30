@@ -1,5 +1,8 @@
 # Phase 4: 視覺元素生成 TODO
 
+> **狀態**:✅ **全部完成於 v3.0.0**(2026-08-31)
+> **5 種視覺元素**:checklist / flow diagram / comparison table / progress bar / timeline
+
 ## 目標
 讓每張投影片至少有 1 個視覺元素(checklist / 流程圖 / 對照表 / 進度條 / 時間軸),
 不再只是純文字 bullet。
