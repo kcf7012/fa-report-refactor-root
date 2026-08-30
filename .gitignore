@@ -2,6 +2,11 @@
 # FA Report 專案根目錄 .gitignore
 # ============================================
 
+# 環境變數(包含 API key)
+.env
+.env.*
+!.env.example
+
 # Python
 __pycache__/
 *.py[cod]

@@ -44,14 +44,28 @@ class OpenAIClient:
     _client: Any = field(default=None, init=False, repr=False)
 
     def _get_api_key(self) -> str:
-        """取得 API key,優先使用傳入值,其次環境變數"""
+        """取得 API key,優先使用傳入值,其次環境變數,最後 .env 檔案"""
         if self.api_key:
             return self.api_key
+
+        # 嘗試從 .env 載入(同時搜尋當前目錄與上層)
+        try:
+            from dotenv import find_dotenv, load_dotenv
+
+            dotenv_path = find_dotenv(usecwd=True)
+            if dotenv_path:
+                load_dotenv(dotenv_path=dotenv_path)
+            else:
+                load_dotenv()  # fallback
+        except ImportError:
+            pass  # python-dotenv 未安裝,跳過
+
         key = os.environ.get("OPENAI_API_KEY")
         if not key:
             raise LLMAuthError(
                 "找不到 OpenAI API key。"
-                "請設定 OPENAI_API_KEY 環境變數或在初始化時傳入 api_key。"
+                "請設定 OPENAI_API_KEY 環境變數、在 .env 檔案中提供，"
+                "或在初始化時傳入 api_key。"
             )
         return key
 
