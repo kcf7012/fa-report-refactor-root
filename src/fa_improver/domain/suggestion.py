@@ -67,7 +67,7 @@ class Improvement:
         """從 JSON dict 建立"""
         if isinstance(data, str):
             # 簡化格式:"[高] 項目: 建議"
-            return cls._from_string(data)
+            return cls.from_text(data)
         return cls(
             priority=Priority(data.get("priority", "中")),
             item=data.get("item", ""),
@@ -75,7 +75,8 @@ class Improvement:
         )
 
     @classmethod
-    def _from_string(cls, text: str) -> "Improvement":
+    def from_text(cls, text: str) -> "Improvement":
+        """從字串解析(支援 "[高] 項目: 建議" 格式)"""
         import re
 
         # "[高] 根因分析: ..."
