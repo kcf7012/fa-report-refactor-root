@@ -1,6 +1,6 @@
-# 測試規範 — v3.0
+# 測試規範 — v3.0.1
 
-> **目標**:確保所有變更都有完整測試覆蓋,維持 92+ 測試通過
+> **目標**:確保所有變更都有完整測試覆蓋,維持 105+ 測試通過(102 passed + 3 skipped)
 > **原則**:**TDD**(測試先行) + **母片保護**為最高優先
 
 ---
@@ -13,24 +13,23 @@
 # 切到技能包目錄
 cd .agents/skills/fa-report-improvement
 
-# 全部測試
-../venv/bin/python -m pytest tests/ -v
+# 全部測試(含覆蓋率)
+.venv/bin/python -m pytest tests/ -v --cov=fa_improver --cov-report=term-missing
 
 # 僅單元測試(快速)
-../venv/bin/python -m pytest tests/unit/ -v
+.venv/bin/python -m pytest tests/unit/ -v
 
 # 僅整合測試
-../venv/bin/python -m pytest tests/integration/ -v
-
-# 含覆蓋率
-../venv/bin/python -m pytest tests/ --cov=src/fa_improver
+.venv/bin/python -m pytest tests/integration/ -v
 
 # 跑特定測試
-../venv/bin/python -m pytest tests/unit/test_filename_parser.py -v
+.venv/bin/python -m pytest tests/unit/test_ppt_converter.py -v
 
 # 跑特定測試類別
-../venv/bin/python -m pytest tests/unit/test_visual_generators.py::TestChecklistGenerator -v
+.venv/bin/python -m pytest tests/unit/test_visual_generators.py::TestChecklistGenerator -v
 ```
+
+> 💡 **uv 使用者**:可用 `uv run pytest tests/` 取代 `.venv/bin/python -m pytest tests/`
 
 ---
 
@@ -53,7 +52,8 @@ tests/
 │   ├── test_env_loading.py        # .env 載入測試
 │   ├── test_visual_generators.py   # 視覺元素測試
 │   ├── test_new_improvers.py      # Phase 4.5 新增測試
-│   └── test_domain.py             # 領域模型測試
+│   ├── test_domain.py             # 領域模型測試
+│   └── test_ppt_converter.py      # ★ v3.0.1 新增(.ppt 轉換)
 │
 ├── integration/                  # 端對端測試
 │   ├── __init__.py
@@ -149,10 +149,10 @@ def test_new_feature_preserves_master(sample_pptx):
 
 ---
 
-## 五、CI 整合(未來)
+## 五、CI 整合(已啟用)
 
 ```yaml
-# .github/workflows/test.yml
+# .github/workflows/test.yml — v3.0.1 已啟用
 name: Tests
 on: [push, pull_request]
 jobs:
@@ -165,6 +165,8 @@ jobs:
       - run: uv run pytest --cov=src/fa_improver --cov-report=xml
       - uses: codecov/codecov-action@v3
 ```
+
+> ✅ v3.0.1 起 CI 已在 `.github/workflows/test.yml` 運作中
 
 ---
 

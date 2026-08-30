@@ -7,7 +7,7 @@
 
 ## 📂 docs/ 結構與索引
 
-### 【 評估/設計文件】11 份
+### 【 評估/設計文件】12 份
 
 | 檔案 | 內容 |
 |------|------|
@@ -18,10 +18,11 @@
 | `04_summary_design.md` | Summary 拆解設計 |
 | `05_prevention_design.md` | 改善對策拆解設計 |
 | `06_expansion_patterns.md` | 通用展開模式 |
-| `07_llm_agent.md` | LLM Agent + Coding Agent 風格 |
+| `07_llm_agent.md` | **LLM 整合詳細設計**(實際位置) |
 | `08_uv_integration.md` | uv 套件管理 |
 | `09_improvement_coverage.md` | 6 維度改善覆蓋率分析 |
 | `VISION.md` | 智慧化願景核心 |
+| `10_api_reference.md` | **v3.0.1 公開 API 參考手冊**(35 模組) |
 
 ### 【 Phase 計畫/進度】5 份
 
@@ -33,11 +34,12 @@
 | `PHASE4_5_TODO.md` | Phase 4.5: 補齊 3 個維度 |
 | `PHASE5_TODO.md` | Phase 5: 最終發布 |
 
-### 【 開發規範】2 份
+### 【 開發規範】3 份
 
 | 檔案 | 內容 |
 |------|------|
 | `README.md` | 本檔(完整索引) |
+| `10_api_reference.md` | **v3.0.1 公開 API 參考手冊**(35 模組) |
 | `TESTING.md` | 測試規範(AAA 模式、母片保護、覆蓋率目標) |
 
 ### 【 使用手冊】1 份
@@ -57,7 +59,7 @@
 │   ├── SKILL.md                            # 技能包入口文件
 │   ├── scripts/                            # 執行腳本
 │   ├── src/                                # v3.0 模組化程式碼
-│   ├── tests/                              # 92 個測試
+│   ├── tests/                              # 105 個測試(102 passed + 3 skipped)
 │   ├── references/                         # 領域參考文件
 │   ├── examples/                           # 自訂樣板範例
 │   ├── pyproject.toml                      # 套件設定
@@ -163,5 +165,6 @@
 
 ---
 
-**最後更新**:2026-08-30
+**最後更新**:2026-01-15
+**版本**:v3.0.1
 **維護者**:Kenny Kang (ELAN FA Report 專案)

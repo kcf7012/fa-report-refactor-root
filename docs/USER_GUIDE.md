@@ -1,7 +1,7 @@
 # FA Report Improvement v3.0 — 使用手冊
 
 > **完整使用指南**:從安裝到進階應用,涵蓋所有使用情境
-> **版本**:v3.0.0(2026-08-31)
+> **版本**:v3.0.1(2026-01-15)
 > **適用對象**:FA 工程師、品管主管、研發團隊
 
 ---
@@ -52,7 +52,20 @@ source venv/bin/activate  # Linux/macOS
 pip install -e ".[dev,llm]"
 ```
 
-### 1.2 設定 API Key(選填)
+### 1.2 執行方式選擇
+
+技能包提供 3 種執行方式(+ 1 種安裝後的系統指令):
+
+| # | 方式 | 指令 | 適用 |
+|---|------|------|------|
+| **1** | **新 CLI**(推薦) | `python -m fa_improver ...` | 日常使用、CI/CD |
+| **2** | **傳統腳本** | `python scripts/improve_fa_report.py ...` | 向後相容舊版指令 |
+| **3** | **端對端測試** | `python test_llm_end_to_end.py` | 開發測試、展示 |
+| 4 | **系統指令** (需 `pip install -e .`) | `fa-improve ...` | 任何目錄、全域使用 |
+
+詳細使用見 [§ 2 三種使用模式](#2-三種使用模式)與 [§ 2.4 執行方式詳細指令](#24-執行方式詳細指令)。
+
+### 1.3 設定 API Key(選填)
 
 ```bash
 # 複製範例檔
@@ -64,7 +77,7 @@ cp .env.example .env
 
 > **注意**:只有在「用 LLM 直接評估」時才需要 API Key。若已有評估 JSON 可跳過此步。
 
-### 1.3 第一次執行
+### 1.4 第一次執行
 
 ```bash
 # 最簡單的方式:使用預先生成的評估 JSON
@@ -140,6 +153,113 @@ python -m fa_improver report.pptx \
 - 完全離線
 - 無 API 成本
 - 可預測結果(預設回傳)
+
+### 2.4 執行方式詳細指令
+
+#### 方式 1: `python -m fa_improver` (新 CLI · 推薦)
+
+**特點**:完整 argparse 介面、所有選項
+
+**基本用法**:
+```bash
+# 從技能包目錄執行
+cd .agents/skills/fa-report-improvement
+PYTHONPATH=src python -m fa_improver input.pptx \
+    --eval eval.json \
+    --output improved.pptx
+
+# 或安裝後(不需 PYTHONPATH)
+pip install -e .
+fa-improve input.pptx --eval eval.json --output improved.pptx
+```
+
+**所有選項**:
+```bash
+python -m fa_improver --help
+```
+
+```
+positional arguments:
+  input                 輸入 pptx 檔案路徑
+
+options:
+  -h, --help            顯示說明
+  -e, --eval EVAL       評估檔(JSON 或 TXT)
+  --llm-provider        LLM provider(openai / mock)
+  --model               LLM 模型(預設 gpt-4o-mini)
+  -o, --output          輸出 pptx 檔案路徑
+  --template-dir        自訂樣板目錄
+  -v, --verbose         詳細輸出
+```
+
+#### 方式 2: `scripts/improve_fa_report.py` (傳統 CLI · 向後相容)
+
+**特點**:簡單位置參數、舊版用戶無需改指令
+
+**基本用法**:
+```bash
+cd .agents/skills/fa-report-improvement
+python scripts/improve_fa_report.py input.pptx eval.json output.pptx
+```
+
+**自動委派**:內部會轉換為新 CLI 的命名參數(`--eval` / `--output`)。
+
+#### 方式 3: 端對端測試程式
+
+**特點**:自動評估+改善+成本報告,適合開發測試與展示
+
+**test_llm_end_to_end.py** — 完整 LLM 評估 + 改善流程:
+```bash
+cd .agents/skills/fa-report-improvement
+python test_llm_end_to_end.py
+
+# 指定報告
+python test_llm_end_to_end.py /path/to/report.pptx
+```
+
+**輸出範例**:
+```
+評估分數: D (65.0/100)
+改善動作: 12 個
+投影片增加: 7 張
+母片保護: 通過 ✓
+預估成本: $0.0006 USD
+```
+
+**test_api_key.py** — 只驗證 API key:
+```bash
+python test_api_key.py
+```
+
+#### 方式 4: 系統層級指令 `fa-improve` (安裝後)
+
+**特點**:安裝套件後,任何目錄都可以呼叫
+
+**安裝**:
+```bash
+cd .agents/skills/fa-report-improvement
+pip install -e .
+```
+
+**使用**:
+```bash
+# 任何目錄
+fa-improve /path/to/report.pptx --eval /path/to/eval.json --output /path/to/output.pptx
+```
+
+**解除安裝**:
+```bash
+pip uninstall fa-improver
+```
+
+#### 執行方式選擇指南
+
+| 情境 | 推薦方式 |
+|------|---------|
+| 日常使用 | 方式 1 (`python -m fa_improver`) |
+| 舊版指令相容 | 方式 2 (傳統腳本) |
+| 開發/展示 | 方式 3 (端對端測試) |
+| 系統整合 | 方式 4 (`fa-improve`) |
 
 ---
 
