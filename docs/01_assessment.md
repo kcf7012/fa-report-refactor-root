@@ -327,4 +327,4 @@ class MockClient: ...    # 離線/測試用
 ---
 
 **詳細重構計畫見**:`02_refactor_plan.md`
-**LLM 整合詳細設計**:`03_llm_integration.md`
+**LLM 整合詳細設計**:`07_llm_agent.md`
