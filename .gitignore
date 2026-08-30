@@ -70,3 +70,6 @@ Thumbs.db
 *.tmp
 # WSL metadata files
 *:Zone.Identifier
+HANDOFF.md
+
+# 臨時交接文檔(任務完成後可刪除)

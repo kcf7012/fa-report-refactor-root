@@ -51,7 +51,7 @@
 ## 📂 專案結構
 
 ```
-/home/elan/fa-report/
+/home/elan/fa-report-refactor/
 ├── .agents/skills/fa-report-improvement/   # ★ 技能包本體(獨立 git 版本控制)
 │   ├── .git/                                # 技能包自己的版本歷史
 │   ├── SKILL.md                            # 技能包入口文件
@@ -85,7 +85,7 @@
 
 | 倉庫 | 位置 | 追蹤內容 | 對象 |
 |------|------|---------|------|
-| 根倉庫 | `/home/elan/fa-report/` | docs/ + report/ | 外部 Agent、評估者 |
+| 根倉庫 | `/home/elan/fa-report-refactor/` | docs/ + report/ | 外部 Agent、評估者 |
 | 技能包倉庫 | `.agents/skills/fa-report-improvement/` | SKILL.md + src/ + tests/ | 技能包使用者、開發者 |
 
 **為何分開?**技能包未來可能:
