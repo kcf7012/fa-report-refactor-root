@@ -1,9 +1,12 @@
 # FA Report Improvement Skill — v3.0 重構計畫
 
-> **目標版本**:v3.0.0
+> **目標版本**:v3.0.0 ✅ 完成 + v3.0.1 ✅ 完成
 > **基線**:`baseline-v2.3.0`(git tag)
-> **預估工時**:42 工時
+> **預估工時**:42 工時(實際為 v3.0.0 發布 + v3.0.1 補充)
 > **重構原則**:**所有操作必須保留下游設計師精心設計的母片樣式**
+> **狀態**:✅ **5 個 Phase 全部完成**
+> - **v3.0.0**(2026-08-31):模組化 + 6 維度 100% 覆蓋 + LLM 整合
+> - **v3.0.1**(2026-01-15):pre-commit / uv.lock / 13 個新測試 / ruff 全綠
 
 ---
 
@@ -479,9 +482,19 @@ def test_openai_client_with_mock_response(monkeypatch):
 3. ✅ **測試覆蓋 ≥80%**:包含母片保護測試
 4. ✅ **支援 .txt 評估**:可解析 SKILL.md 提及的所有輸入
 5. ✅ **支援 LLM 評估**:至少 OpenAI API + Mock,可用 `--api-key` 直接呼叫
-6. ✅ **可配置樣板**:5 個內建樣板 + 支援自訂
+6. ✅ **可配置樣板**:**8 個內建樣板** + 支援自訂
 7. ✅ **CI 通過**:pre-commit、pytest、mypy 全部綠燈
 
 ---
 
-**下一步**:請確認本計畫,接著執行 Phase 1(基礎建設)。
+**結論**:✅ **5 個 Phase 全部完成於 v3.0.0 + v3.0.1**
+
+驗證結果:
+- 105 個測試(102 passed + 3 skipped)
+- 覆蓋率 85%(目標 80%)
+- ruff All checks passed
+- pre-commit 4 大類 hook 啟用中
+- uv-managed `.venv/` + `uv.lock` 鎖定 51 個套件
+- git tag:`v3.0.0` + `v3.0.1`
+
+實際交付請看 `docs/10_api_reference.md` + 技能包 `CHANGELOG.md`。
