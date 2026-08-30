@@ -40,6 +40,12 @@
 | `README.md` | 本檔(完整索引) |
 | `TESTING.md` | 測試規範(AAA 模式、母片保護、覆蓋率目標) |
 
+### 【 使用手冊】1 份
+
+| 檔案 | 內容 |
+|------|------|
+| `USER_GUIDE.md` | v3.0 完整使用手冊(快速開始、三種模式、6 維度、樣板、LLM、常見問題) |
+
 ---
 
 ## 📂 專案結構
@@ -114,6 +120,9 @@
 
 ### 如果你想知道測試規範
 → 看 `TESTING.md`
+
+### 如果你想知道如何使用技能包
+→ 看 `USER_GUIDE.md`
 
 ### 如果你是 Coding Agent 接手開發
 → 依序看:`00_executive_summary.md` → `VISION.md` → `02_refactor_plan.md` → 對應功能文件
