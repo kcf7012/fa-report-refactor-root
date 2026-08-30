@@ -13,13 +13,20 @@
 │   ├── .git/                                # 技能包自己的版本歷史
 │   ├── SKILL.md                            # 技能包入口文件
 │   ├── scripts/                            # 執行腳本
-│   └── references/                         # 領域參考文件
+│   ├── src/                                # v3.0 模組化程式碼
+│   ├── tests/                              # 92 個測試
+│   ├── references/                         # 領域參考文件
+│   ├── examples/                           # 自訂樣板範例
+│   ├── pyproject.toml                      # 套件設定
+│   ├── .python-version                     # Python 3.10
+│   └── .env.example                       # 環境變數範例
 │   ↑ 本資料來不納入根倉庫 git(有自己的版控)
 │
 ├── docs/                                   # ★ 專案評估與設計文件
 │   ├── README.md (本檔)
 │   ├── 00_executive_summary.md             # 三件最重要的事
 │   ├── VISION.md                           # 智慧化願景
+│   ├── TESTING.md                          # 測試規範
 │   ├── 01_assessment.md                    # 問題評估
 │   ├── 02_refactor_plan.md                 # 重構計畫
 │   ├── 03_design_comparison.md             # 視覺設計對比
@@ -27,7 +34,8 @@
 │   ├── 05_prevention_design.md             # 改善對策設計
 │   ├── 06_expansion_patterns.md            # 通用展開模式
 │   ├── 07_llm_agent.md                     # Agent 設計
-│   └── 08_uv_integration.md                # uv 套件管理
+│   ├── 08_uv_integration.md                # uv 套件管理
+│   └── 09_improvement_coverage.md          # 改善覆蓋率分析
 │
 └── report/                                 # FA 報告與評估 JSON
     ├── *.pptx                              # 原始報告
