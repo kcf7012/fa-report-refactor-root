@@ -1,0 +1,65 @@
+# ============================================
+# FA Report 專案根目錄 .gitignore
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Virtual Environment
+venv/
+env/
+.venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS
+*~
+*.tmp
+*.bak
+*.log
+
+# ============================================
+# 技能包(.agents/skills/fa-report-improvement/)
+# 內部已有獨立 git 版本控制,不納入根倉庫
+# 詳見 docs/README.md
+# ============================================
+.agents/
+
+# ============================================
+# 暫存 / 測試文件
+# ============================================
+/tmp/
+/test/
+*.tmp

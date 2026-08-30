@@ -1,0 +1,70 @@
+{
+  "source_file": "MS_Meishan_ADO_445239_260716.pptx",
+  "task_id": "9d9daea8-b733-4d28-9983-e29a71aee92c",
+  "total_score": 41.5,
+  "grade": "F",
+  "dimension_scores": {
+    "基本資訊完整性": {
+      "score": 40,
+      "weight": 15,
+      "comment": "僅提供部分編號與日期，缺乏產品型號、客戶資訊、製造日期及負責工程師等核心資訊。"
+    },
+    "問題描述與定義": {
+      "score": 45,
+      "weight": 15,
+      "comment": "有定義測試方法與失效狀態（Fail），但缺乏失效現象的具體描述、失效影響範圍及失效率統計。"
+    },
+    "分析方法與流程": {
+      "score": 30,
+      "weight": 20,
+      "comment": "僅呈現 Robot Log 與測試參數，完全沒有展示任何實質的失效分析手段（如 SEM, X-ray 或軟體 Debug 過程），流程極度不完整。"
+    },
+    "數據與證據支持": {
+      "score": 50,
+      "weight": 20,
+      "comment": "提供了測試 log 與參數表，但僅能證明「測試失敗了」，無法證明「為什麼失敗」。缺乏支持根因的物理或數據證據。"
+    },
+    "根因分析": {
+      "score": 0,
+      "weight": 20,
+      "comment": "報告中完全沒有提及任何根因分析（Root Cause Analysis），亦無 5-Why 或邏輯推導過程。"
+    },
+    "改善對策": {
+      "score": 0,
+      "weight": 10,
+      "comment": "報告中完全沒有提及任何改善對策或預防措施。"
+    }
+  },
+  "strengths": [
+    "提供了清晰的測試參數定義表 (Parameter Table)",
+    "提供了測試序列的執行時間與結果對照表 (Sequence Log)"
+  ],
+  "improvements": [
+    {
+      "priority": "高",
+      "item": "根因分析 (Root Cause Analysis)",
+      "suggestion": "必須加入失效原因的深入探討，利用邏輯推導或實驗數據證明為何設備會在 Suspend 期間被 Wake up。"
+    },
+    {
+      "priority": "高",
+      "item": "改善對策 (Corrective Action)",
+      "suggestion": "針對確定的根因提出短期修復與長期預防措施，並包含驗證計畫。"
+    },
+    {
+      "priority": "高",
+      "item": "資訊完整性",
+      "suggestion": "補齊產品基本資訊、客戶資訊及負責人員，以符合標準 FA 報告規範。"
+    },
+    {
+      "priority": "中",
+      "item": "分析手段與證據",
+      "suggestion": "增加失效分析的技術手段描述（如：是否檢查了感測器訊號、韌體 Log 或硬體干擾），並附上相關證據圖片。"
+    }
+  ],
+  "summary": "此報告目前僅能被視為一份「測試紀錄 (Test Log)」，而非「失效分析報告 (Failure Analysis Report)」。報告僅記錄了測試失敗的結果，完全缺失了「為什麼會失敗」的分析過程與「如何解決」的對策。報告內容與失效分析的邏輯鏈嚴重斷裂，建議必須補齊根因分析與改善對策後方可作為正式文件。",
+  "token_usage": {
+    "prompt_tokens": 2420,
+    "completion_tokens": 791,
+    "total_tokens": 3211
+  }
+}

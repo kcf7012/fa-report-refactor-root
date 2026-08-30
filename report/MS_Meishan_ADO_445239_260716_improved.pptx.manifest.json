@@ -1,0 +1,31 @@
+{
+  "execution_status": "success",
+  "timestamp": "2026-08-30T20:39:27.401779",
+  "input_file": "/home/elan/fa-report/report/MS_Meishan_ADO_445239_260716.pptx",
+  "output_file": "/home/elan/fa-report/report/MS_Meishan_ADO_445239_260716_improved.pptx",
+  "added_slides": [
+    {
+      "dimension": "基本資訊完整性",
+      "index": 1,
+      "suggestions_count": 2
+    },
+    {
+      "dimension": "根因分析",
+      "index": 2,
+      "suggestions_count": 4
+    },
+    {
+      "dimension": "改善對策",
+      "index": 3,
+      "suggestions_count": 1
+    }
+  ],
+  "dimensions_improved": [
+    "基本資訊完整性",
+    "根因分析",
+    "改善對策"
+  ],
+  "errors": [],
+  "summary_applied": true,
+  "figure_captions_improved": true
+}

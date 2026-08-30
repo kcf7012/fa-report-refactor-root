@@ -1,0 +1,25 @@
+{
+  "execution_status": "success",
+  "timestamp": "2026-08-30T20:27:47.428070",
+  "input_file": "/home/elan/fa-report/report/N160JCN-EEK project 1pcs NG sample analysis report 260810.pptx",
+  "output_file": "/home/elan/fa-report/report/N160JCN-EEK_project_1pcs_NG_sample_analysis_report_260810_improved.pptx",
+  "added_slides": [
+    {
+      "dimension": "根因分析",
+      "index": 7,
+      "suggestions_count": 4
+    },
+    {
+      "dimension": "改善對策",
+      "index": 8,
+      "suggestions_count": 1
+    }
+  ],
+  "dimensions_improved": [
+    "根因分析",
+    "改善對策"
+  ],
+  "errors": [],
+  "summary_applied": true,
+  "figure_captions_improved": true
+}
