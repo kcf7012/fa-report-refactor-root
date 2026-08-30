@@ -68,3 +68,5 @@ Thumbs.db
 /tmp/
 /test/
 *.tmp
+# WSL metadata files
+*:Zone.Identifier

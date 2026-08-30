@@ -12,6 +12,13 @@ from pptx.enum.text import PP_ALIGN
 from ..domain.evaluation import EvaluationResult
 from ..domain.suggestion import Improvement
 from ..layout.selector import find_content_layout
+from ..visuals import (
+    ELAN_BLUE,
+    ELAN_GREEN,
+    ELAN_ORANGE,
+    ELAN_RED,
+    ProgressBarGenerator,
+)
 
 
 def enhance_summary_section(
@@ -23,17 +30,20 @@ def enhance_summary_section(
 
     策略:
     - 保留原 Summary 投影片不動
-    - 在右側區域注入 Executive Summary 與 Key Improvements
-    - 不修改母片
+    - 注入 Executive Summary 與 Key Improvements
+    - 若有空間,加入 6 維度評分視覺化
     """
     summary_idx = _find_summary_index(prs)
     if summary_idx == -1:
-        # 沒找到 Summary,使用最後一張
         summary_idx = len(prs.slides) - 1
     if summary_idx < 0:
         return
 
     slide = prs.slides[summary_idx]
+
+    # 注入 6 維度評分進度條(若有資料)
+    if evaluation.dimensions:
+        _add_dimension_progress(slide, evaluation)
 
     # 注入 Executive Summary
     _add_executive_summary(slide, evaluation)
@@ -129,3 +139,39 @@ def _add_strengths(slide, evaluation: EvaluationResult) -> None:
         p = tf.add_paragraph()
         p.text = f"✓ {s}"
         p.font.size = Pt(10)
+
+
+def _add_dimension_progress(slide, evaluation: EvaluationResult) -> None:
+    """加入 6 維度評分進度條"""
+    if not evaluation.dimensions:
+        return
+
+    # 根據分數決定顏色
+    def color_for_score(score: float):
+        if score >= 85:
+            return ELAN_GREEN
+        if score >= 70:
+            return ELAN_BLUE
+        if score >= 50:
+            return ELAN_ORANGE
+        return ELAN_RED
+
+    items = [
+        {
+            "label": dim_score.name.value,
+            "value": dim_score.score,
+            "max_value": 100,
+            "color": color_for_score(dim_score.score),
+        }
+        for dim_score in evaluation.dimensions
+    ]
+
+    # 放在原有內容下方(不重疊)
+    gen = ProgressBarGenerator(
+        slide,
+        left=1.0,
+        top=5.2,
+        width=8.0,
+        height=2.0,
+    )
+    gen.generate(items)
