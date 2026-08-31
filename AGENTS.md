@@ -14,12 +14,12 @@
 |------|-----|
 | **名稱** | fa-report-refactor |
 | **用途** | 半導體 FA(Failure Analysis)報告智慧化改善工具 |
-| **當前版本** | v3.0.1(2026-08-31) |
+| **當前版本** | v3.1.0(2026-08-31) |
 | **Git 倉庫** | 雙倉庫架構(根倉庫 + 技能包子倉庫) |
 | **主語言** | Python ≥ 3.10 |
 | **套件管理** | uv 0.12.7+(取代 pip + venv) |
 | **測試框架** | pytest + pytest-cov |
-| **測試結果** | 102 passed + 3 skipped,覆蓋率 **85%** |
+| **測試結果** | 203 passed + 3 skipped,覆蓋率 **90%** |
 | **Lint** | ruff + black(由 pre-commit 自動執行) |
 | **主入口** | `.agents/skills/fa-report-improvement/src/fa_improver/cli.py` |
 
@@ -125,7 +125,7 @@ fa-report-refactor/
 8. `.agents/skills/fa-report-improvement/SKILL.md` — 技能包入口
 
 ### 4.4 理解歷史決策
-9. `docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md` — **8 項 v3.1+ 未完成項清單** ⭐
+9. ~~`docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md` — 8 項 v3.1+ 未完成項清單~~(已全部完成,參考 § 十一)
 10. `docs/PHASE2-5_TODO.md` — 歷史任務清單(已全部 ✅ 完成,但有誠實標記的差距)
 
 ---
@@ -334,31 +334,44 @@ cp .env.example .env
 # 編輯 .env 填入 OPENAI_API_KEY
 ```
 
-### 10.2 ⚠️ 安全警告
+### 10.2 ✅ 安全強化(個資遮罩)
 
-LLM 送出前**應該遮罩個資**(姓名、電話、email),但**目前尚未實作**:
+v3.1.0 起,LLM 送出前可自動遮罩個資:
 
-- 🔴 `src/fa_improver/llm/redact.py` **不存在**
-- 詳見 `docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md`
+- ✅ `src/fa_improver/llm/redact.py` **已實作**
+- **遮罩類型**:電話、Email、中文姓名、IP、工號、身分證、信用卡
+- **啟用方式**:
+  - CLI:`fa-improve input.pptx --llm-provider openai --redact-pii ...`
+  - Python:`OpenAIClient(redact_pii_before_send=True)`
+- **詳細用法**:參見 CHANGELOG v3.1.0 章節
 
-**建議**:在使用 LLM 評估真實報告前,**手動檢查內容**是否含個資。
+預設關閉(向後相容)。建議對真實報告**啟用遮罩**。
+
+### 10.3 重試機制(tenacity)
+
+v3.1.0 起,OpenAI client 自動處理瞬時錯誤:
+
+- **重試策略**:tenacity exponential backoff(1s → 2s → 4s,最多 `max_retries` 次)
+- **不重試**:認證錯誤(401 / Invalid api_key)— 立即拋出 `LLMAuthError`
 
 ---
 
-## 十一、8 項 v3.1+ 優化項(下一輪任務)
+## 十一、v3.1.0 優化項(✅ 全部完成於 2026-08-31)
 
-agent 接手時若發現這些項目尚未完成,可主動補完:
+8 項 v3.1+ 優化項已全部完成並在 v3.1.0 tag 發布。詳見各項目的 commit:
 
-| 優先 |項目 | 位置 |
-|------|------|------|
-| 🔴 P0 | 個資遮罩 | `src/fa_improver/llm/redact.py`(待新建) |
-| 🟡 P1 | 重試機制(tenacity) | `src/fa_improver/llm/openai_client.py` |
-| 🟡 P1 | improvers 用 TemplateLoader | `src/fa_improver/improvers/*.py`(7 檔案) |
-| 🟢 P2 | 3 個 improver 用視覺元素 | `basic_info.py` / `root_cause.py` / `prevention.py` |
-| 🟢 P2 | `--api-key` CLI 參數 | `src/fa_improver/cli.py` |
-| 🟢 P2 | `test_template_validation.py` | `tests/unit/`(待新建) |
+| 優先 |項目 | Commit | 狀態 |
+|------|------|--------|------|
+| 🔴 P0 | 個資遮罩(`llm/redact.py`) | `92c9a68` | ✅ 完成 |
+| 🟡 P1 | 重試機制(tenacity) | `559c9e4` | ✅ 完成 |
+| 🟡 P1 | 7 個 improver 用 TemplateLoader | `02cd238` | ✅ 完成 |
+| 🟢 P2 | 3 個 improver 用視覺元素 | `bbb28ba` | ✅ 完成 |
+| 🟢 P2 | `--api-key` CLI 參數 | `b5fbfba` | ✅ 完成 |
+| 🟢 P2 | `test_template_validation.py` | `9a39076` | ✅ 完成 |
 
-詳見 `docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md`。
+**成果**:測試 102 → 203(+101),覆蓋率 85% → 90%,tag `v3.1.0` 已建立。
+
+下一輪任務參考 `docs/handoff/` 最新交接文檔。
 
 ---
 
