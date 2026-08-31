@@ -24,15 +24,15 @@
 | `VISION.md` | 智慧化願景核心 |
 | `10_api_reference.md` | **v3.0.1 公開 API 參考手冊**(35 模組) |
 
-### 【 Phase 計畫/進度】5 份
+### 【 Phase 計畫/進度】5 份(全部完成於 v3.0.0 + v3.0.1)
 
-| 檔案 | 對應 Phase |
-|------|-----------|
-| `PHASE2_TODO.md` | Phase 2: 樣板系統 |
-| `PHASE3_TODO.md` | Phase 3: LLM Client + .env |
-| `PHASE4_TODO.md` | Phase 4: 視覺元素 |
-| `PHASE4_5_TODO.md` | Phase 4.5: 補齊 3 個維度 |
-| `PHASE5_TODO.md` | Phase 5: 最終發布 |
+| 檔案 | 對應 Phase | 狀態 |
+|------|-----------|------|
+| `PHASE2_TODO.md` | Phase 2: 樣板系統 | ✅ v3.0.0 |
+| `PHASE3_TODO.md` | Phase 3: LLM Client + .env | ✅ v3.0.0 |
+| `PHASE4_TODO.md` | Phase 4: 視覺元素 | ✅ v3.0.0 |
+| `PHASE4_5_TODO.md` | Phase 4.5: 補齊 3 個維度 | ✅ v3.0.0 |
+| `PHASE5_TODO.md` | Phase 5: 最終發布 | ✅ v3.0.1 |
 
 ### 【 開發規範】3 份
 
@@ -46,7 +46,7 @@
 
 | 檔案 | 內容 |
 |------|------|
-| `USER_GUIDE.md` | v3.0 完整使用手冊(快速開始、三種模式、6 維度、樣板、LLM、常見問題) |
+| `USER_GUIDE.md` | **v3.0.1** 完整使用手冊(快速開始、4 種執行方式、6 維度、樣板、LLM、常見問題) |
 
 ---
 
@@ -118,7 +118,7 @@
 - 改善對策 → `05_prevention_design.md`
 
 ### 如果你想知道目前 Phase 進度
-→ 看 `PHASE{n}_TODO.md`(對應 Phase)
+→ 看 `PHASE{n}_TODO.md`(對應 Phase,**已全部完成**,作為歷史紀錄保留)
 
 ### 如果你想知道測試規範
 → 看 `TESTING.md`
