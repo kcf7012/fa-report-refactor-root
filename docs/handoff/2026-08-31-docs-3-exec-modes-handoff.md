@@ -1,6 +1,6 @@
 # Handoff: 為 fa-report-improvement skill 補上「3 種執行方式」文件
 
-> 建立日期:2026-01-15
+> 建立日期:2026-08-31
 > 交接給:下一個文件維護任務 / agent
 > 工作目錄:`/home/elan/fa-report-refactor`
 

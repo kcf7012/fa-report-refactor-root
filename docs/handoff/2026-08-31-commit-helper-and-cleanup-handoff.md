@@ -1,6 +1,6 @@
 # Handoff: 建立 commit-helper 技能包 + 完成 v3.0.1 commit 鏈
 
-> 建立日期:2026-01-15
+> 建立日期:2026-08-31
 > 交接給:下一個開發任務 / agent
 > 工作目錄:`/home/elan/fa-report-refactor/.agents/skills/fa-report-improvement`
 
@@ -109,5 +109,5 @@ TOTAL  1550   232   85%
 
 ---
 
-✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-01-15-commit-helper-and-cleanup-handoff.md`
+✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-08-31-commit-helper-and-cleanup-handoff.md`
    包含:8 個區塊,5 個已確認結論,4 個待確認事項

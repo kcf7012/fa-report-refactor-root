@@ -527,7 +527,7 @@ src/fa_improver/
 
 | 版本 | 日期 | 主要變更 |
 |------|------|---------|
-| v3.0.1 | 2026-01-15 | 加入 ppt_converter / pre-commit / uv.lock, ruff 全綠 |
+| v3.0.1 | 2026-08-31 | 加入 ppt_converter / pre-commit / uv.lock, ruff 全綠 |
 | v3.0.0 | 2026-08-31 | 模組化 + 6 維度完整覆蓋 + LLM 整合 |
 
 ## 相關文件

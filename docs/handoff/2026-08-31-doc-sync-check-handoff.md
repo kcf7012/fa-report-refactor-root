@@ -1,6 +1,6 @@
 # Handoff: 全面文檔同步檢視與更新
 
-> 建立日期:2026-01-15
+> 建立日期:2026-08-31
 > 交接給:下一個文件維護 / agent 任務
 > 工作目錄:`/home/elan/fa-report-refactor`
 
@@ -14,8 +14,8 @@
 
 | # | 檔案 | 修改內容 |
 |---|------|---------|
-| 1 | `docs/README.md` | 「92 個測試」→ 105、日期 2026-08-30 → 2026-01-15、版本 v3.0.0 → v3.0.1、12 份評估文件清單 |
-| 2 | `docs/USER_GUIDE.md` | 版本 v3.0.0 (2026-08-31) → v3.0.1 (2026-01-15) |
+| 1 | `docs/README.md` | 「92 個測試」→ 105、日期 2026-08-30 → 2026-08-31、版本 v3.0.0 → v3.0.1、12 份評估文件清單 |
+| 2 | `docs/USER_GUIDE.md` | 版本 v3.0.0 (2026-08-31) → v3.0.1 (2026-08-31) |
 | 3 | `docs/TESTING.md` | 92+ → 105 測試、`../venv/bin/python` → `.venv/bin/python`、補上 `test_ppt_converter.py`、`CI 整合(未來)` → `(已啟用)` |
 | 4 | `docs/01_assessment.md` | 壞掉的引用 `03_llm_integration.md` → 正確的 `07_llm_agent.md`(LLM 整合詳細設計的真正位置) |
 | 5 | `.agents/skills/fa-report-improvement/SKILL.md` | version 3.0.0 → 3.0.1、89 個 → 105 個測試、`pytest tests/` → `.venv/bin/python -m pytest tests/` |
@@ -29,7 +29,7 @@
 | 8 | `docs/08_uv_integration.md` | 標頭加「狀態:✅ v3.0.1 完全完成」、Phase 1-4 全部勾選 ✓、修正最後的「整合進度」段落 |
 | 9 | `.agents/skills/fa-report-improvement/requirements.txt` | 加註「v3.0.1 起主要依賴管理已遷移至 pyproject.toml」、補上 `pydantic` / `python-dotenv` / `openai` |
 | 10 | `docs/README.md` | 「11 份」→ 「12 份」、統一數字 |
-| 11 | `docs/README.md` | 「最後更新:2026-08-30」→ 「2026-01-15」+ 版本 v3.0.1 |
+| 11 | `docs/README.md` | 「最後更新:2026-08-30」→ 「2026-08-31」+ 版本 v3.0.1 |
 
 ## 3. 關鍵檔案和位置
 
@@ -99,5 +99,5 @@
 
 ---
 
-✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-01-15-doc-sync-check-handoff.md`
+✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-08-31-doc-sync-check-handoff.md`
    包含:8 個區塊,5 個已確認結論,3 個待確認事項

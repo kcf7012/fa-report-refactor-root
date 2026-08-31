@@ -1,6 +1,6 @@
 # Phase 5: 最終發布準備 TODO
 
-> **狀態**:✅ **全部完成於 v3.0.1**(2026-01-15)
+> **狀態**:✅ **全部完成於 v3.0.1**(2026-08-31)
 > **v3.0.1 tag 已建立**:`v3.0.0` + `v3.0.1`
 > **測試結果**:102 passed + 3 skipped,覆蓋率 85%,ruff All checks passed
 
@@ -57,7 +57,7 @@
 - **uv 整合**:`uv.lock`(343 KB,51 個套件)+ `.venv/` 已使用
 - **CI/CD**:`.github/workflows/test.yml` + `.pre-commit-config.yaml`(4 大類 hook)
 - **文件**:SKILL.md / CHANGELOG.md / README.md / `docs/10_api_reference.md`
-- **Git tag**:`v3.0.0`(2026-08-31)+ `v3.0.1`(2026-01-15)
+- **Git tag**:`v3.0.0`(2026-08-31)+ `v3.0.1`(2026-08-31)
 - **舊 tag**:`baseline-v2.3.0` 已移除
 - **測試結果(驗證)**:102 passed + 3 skipped
 - **覆蓋率**:85%(目標 80%)
