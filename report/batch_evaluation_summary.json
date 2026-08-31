@@ -2,7 +2,7 @@
   "total_cases": 3,
   "success": 3,
   "failed": 0,
-  "total_duration": 0.96,
+  "total_duration": 1.05,
   "results": [
     {
       "name": "260811_Kobo_ZHT_RA6080_SPcomFailI",
@@ -23,9 +23,9 @@
         "enhance_summary"
       ],
       "original_slides": 5,
-      "final_slides": 13,
+      "final_slides": 16,
       "master_preserved": true,
-      "duration_seconds": 0.19
+      "duration_seconds": 0.21
     },
     {
       "name": "MS_Meishan_ADO_445239_260716",
@@ -49,9 +49,9 @@
         "enhance_summary"
       ],
       "original_slides": 5,
-      "final_slides": 16,
+      "final_slides": 19,
       "master_preserved": true,
-      "duration_seconds": 0.21
+      "duration_seconds": 0.24
     },
     {
       "name": "N160JCN-EEK project 1pcs NG sample analysis report 260810",
@@ -73,9 +73,9 @@
         "enhance_summary"
       ],
       "original_slides": 9,
-      "final_slides": 18,
+      "final_slides": 21,
       "master_preserved": true,
-      "duration_seconds": 0.5
+      "duration_seconds": 0.55
     }
   ]
 }

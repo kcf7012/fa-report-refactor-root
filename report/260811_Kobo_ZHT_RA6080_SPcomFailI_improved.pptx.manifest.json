@@ -1,12 +1,12 @@
 {
   "execution_status": "success",
-  "timestamp": "2026-08-31T16:29:27.677126",
+  "timestamp": "2026-09-01T04:07:04.387897",
   "input_file": "/home/elan/fa-report-refactor/report/260811_Kobo_ZHT_RA6080_SPcomFailI.pptx",
   "output_file": "/home/elan/fa-report-refactor/report/260811_Kobo_ZHT_RA6080_SPcomFailI_improved.pptx",
   "original_slide_count": 5,
-  "final_slide_count": 13,
+  "final_slide_count": 16,
   "master_preserved": true,
-  "duration_seconds": 0.19,
+  "duration_seconds": 0.21,
   "actions": [
     "add_basic_info",
     "add_analysis_method",

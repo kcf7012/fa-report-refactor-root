@@ -1,12 +1,12 @@
 {
   "execution_status": "success",
-  "timestamp": "2026-08-31T16:29:28.429663",
+  "timestamp": "2026-09-01T04:07:05.217489",
   "input_file": "/home/elan/fa-report-refactor/report/N160JCN-EEK project 1pcs NG sample analysis report 260810.pptx",
   "output_file": "/home/elan/fa-report-refactor/report/N160JCN-EEK project 1pcs NG sample analysis report 260810_improved.pptx",
   "original_slide_count": 9,
-  "final_slide_count": 18,
+  "final_slide_count": 21,
   "master_preserved": true,
-  "duration_seconds": 0.5,
+  "duration_seconds": 0.55,
   "actions": [
     "add_analysis_method",
     "add_evidence_checklist",

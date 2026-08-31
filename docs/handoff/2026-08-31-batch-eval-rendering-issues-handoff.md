@@ -3,8 +3,11 @@
 > 建立日期:2026-08-31
 > 對象:未來接手 Agent / 維護者
 > 工作目錄:`/home/elan/fa-report-refactor/.agents/skills/fa-report-improvement/`
-> **狀態**:🟡 **v3.1.1 部分完成**(2026-08-31)— 詳見 § 10 修正記錄(部分)+ § 11 未完成項目
-> **重要揭露**:2026-09-01 視覺驗證發現 v3.1.1 仍有 4 大類殘留問題,見 `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md`
+> **狀態**:🟢 **v3.1.2 已修正完成**(2026-09-01)— 詳見 § 10 修正記錄
+> **記錄歷史**:
+> - v3.1.1(2026-08-31)— 🟡 部分完成(空白頁、座標)
+> - v3.1.2(2026-09-01)— 🟢 完整修正(疊加、placeholder、旋轉、殘留)
+> - v3.1.2 tag 已建立,v3.1.1 tag 已刪除(請勿使用 v3.1.1)
 
 ## 1. 背景
 
@@ -487,6 +490,28 @@ SlideAction.ADD_MONITORING_KM                # PREVENTION < 85 時加入
 - **🟢 MS 原圖 slide 1 的「Prepared by: ELAN」shape** 在 `(6.65, 5.99)` 接近右邊界 — 屬 pptx 原始母片設計,非生成 bug
 - **🟢 母片覆蓋(文字被裝飾區蓋到)** — 需先重新設計 pptx 母片,改座標會破壞現有配置
 - **🟢 文字直式排版(autofit)** — textbox 已動態 >= 4 in,但若母片設計特殊仍可能觸發
+
+---
+
+## 12. ✅ v3.1.2 最終修正記錄(2026-09-01)
+
+詳見 `docs/handoff/2026-09-01-v312-final-fixes-handoff.md`。
+
+v3.1.2 已完整修正 v3.1.1 殘留的 4 大類版面渲染問題:
+
+- ✅ Bug 1:enhance_summary_section 疊加覆蓋
+- ✅ Bug 2:_get_or_create_title 找錯 placeholder
+- ✅ Bug 3:textbox / placeholder 被旋轉 90°
+- ✅ Bug 4:底部 placeholder 殘留
+
+並新增 5 個視覺品質測試 + `scripts/visual_smoke_test.py` 視覺驗證腳本。
+
+**v3.1.2 tag 已建立並推送**,**v3.1.1 tag 已刪除**(因有未修問題)。
+
+統計:
+- 總計:215 passed + 3 skipped(從 v3.1.1 的 210 增加 5 個 visual_quality 測試)
+- 覆蓋率:89%
+- Ruff:All checks passed
 
 ---
 
