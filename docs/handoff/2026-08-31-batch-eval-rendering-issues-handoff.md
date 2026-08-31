@@ -3,7 +3,8 @@
 > 建立日期:2026-08-31
 > 對象:未來接手 Agent / 維護者
 > 工作目錄:`/home/elan/fa-report-refactor/.agents/skills/fa-report-improvement/`
-> **狀態**:🟢 **已修正**(v3.1.1,2026-08-31)— 詳見 § 10 修正記錄
+> **狀態**:🟡 **v3.1.1 部分完成**(2026-08-31)— 詳見 § 10 修正記錄(部分)+ § 11 未完成項目
+> **重要揭露**:2026-09-01 視覺驗證發現 v3.1.1 仍有 4 大類殘留問題,見 `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md`
 
 ## 1. 背景
 
@@ -489,4 +490,42 @@ SlideAction.ADD_MONITORING_KM                # PREVENTION < 85 時加入
 
 ---
 
-**⚠️ 重要**:本檔記錄的是**問題清單 + 分析 + 修正記錄**。v3.1.1 已修正所有 P0/P1 問題,P2 留待未來處理。
+## 11. ⚠️ v3.1.1 未完成項目(2026-09-01 揭露)
+
+**2026-09-01 由 Kenny 視覺驗證 28 張截圖發現**,v3.1.1 仍有 4 大類殘留版面渲染問題(這些問題在 2026-08-31 的 smoke test 沒有抓到):
+
+### 11.1 🔴 Bug 1:`enhance_summary_section` 疊加覆蓋
+- 症狀:MS-001 / N160JCN-001 的 Summary 頁,Executive Summary 與 Key Improvements 蓋在原本 Summary 內容(表格 + 進度條)上
+- 位置:`src/fa_improver/improvers/summary.py` `enhance_summary_section()`
+- 修法:改成新增獨立投影片,而非疊加原 Summary
+
+### 11.2 🟡 Bug 2:_get_or_create_title 找錯 placeholder
+- 症狀:MS / N160JCN 的新 slide,標題「按一下即可新增文字」與實際內容並存
+- 位置:7 個 improvers 的 `_get_or_create_title(slide)`
+- 修法:用 `placeholder_format.idx == 0` 嚴格匹配,並清掉其他「按一下」placeholder
+
+### 11.3 🟡 Bug 3:textbox 旋轉 90°
+- 症狀:260811 的 slides 1/3/4/5/6 文字變直式垂直排列
+- 位置:所有 `add_textbox()` 呼叫處
+- 修法:建立 textbox 後設 `rotation = 0`
+
+### 11.4 🟡 Bug 4:底部 placeholder 殘留
+- 症狀:N160JCN 多張 slide 底部出現「按一下即可新增文字」
+- 位置:`orchestrator.add_slide` 後未清掉 footer placeholder 預設文字
+- 修法:加 `_clean_unused_placeholders(slide)` helper
+
+### 11.5 為什麼 v3.1.1 smoke test 沒抓到這些
+
+- smoke test 只測「有沒有文字」、「有沒有超界」,**沒測視覺**(沒把 pptx 轉圖)
+- 作者(pi agent)在 2026-08-31 沒做視覺驗證就標記「修正完成」,屬於流程缺陷
+- 視覺驗證需等 Kenny 手動上傳 Google Slides 才發現
+
+### 11.6 揭露 handoff
+
+詳見 `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md`(2026-09-01 建立)。
+
+**作者強烈建議**:在修正 4 個 Bug 並加入視覺驗證腳本之前,**不要發佈 v3.1.2**。
+
+---
+
+**⚠️ 重要**:本檔記錄的是**問題清單 + 部分修正 + 未完成項目**。v3.1.1 只修了「完全空白」與「座標超出邊界」,但「疊加覆蓋」、「placeholder 殘留」、「textbox 旋轉」仍未修正。
