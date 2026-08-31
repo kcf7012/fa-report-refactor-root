@@ -72,4 +72,10 @@ Thumbs.db
 *:Zone.Identifier
 HANDOFF.md
 
+# smoke test 產物(由 tests/integration/test_slide_rendering.py 生成)
+report/*_smoke.pptx
+report/*_smoke_bounds.pptx
+report/*_smoke_dyn.pptx
+report/*_improved_v2.pptx
+
 # 臨時交接文檔(任務完成後可刪除)

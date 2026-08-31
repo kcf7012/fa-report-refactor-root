@@ -1,0 +1,81 @@
+{
+  "total_cases": 3,
+  "success": 3,
+  "failed": 0,
+  "total_duration": 0.96,
+  "results": [
+    {
+      "name": "260811_Kobo_ZHT_RA6080_SPcomFailI",
+      "status": "success",
+      "input": "260811_Kobo_ZHT_RA6080_SPcomFailI.pptx",
+      "output": "260811_Kobo_ZHT_RA6080_SPcomFailI_improved.pptx",
+      "original_score": 63.5,
+      "original_grade": "D",
+      "actions": [
+        "add_basic_info",
+        "add_analysis_method",
+        "add_evidence_checklist",
+        "add_5_why",
+        "add_statistical",
+        "add_prevention_overview",
+        "add_iqc_standard",
+        "add_monitoring_km",
+        "enhance_summary"
+      ],
+      "original_slides": 5,
+      "final_slides": 13,
+      "master_preserved": true,
+      "duration_seconds": 0.19
+    },
+    {
+      "name": "MS_Meishan_ADO_445239_260716",
+      "status": "success",
+      "input": "MS_Meishan_ADO_445239_260716.pptx",
+      "output": "MS_Meishan_ADO_445239_260716_improved.pptx",
+      "original_score": 41.5,
+      "original_grade": "F",
+      "actions": [
+        "add_basic_info",
+        "add_problem_definition",
+        "add_analysis_method",
+        "add_evidence_checklist",
+        "add_5_why",
+        "add_control_group",
+        "add_evidence",
+        "add_statistical",
+        "add_prevention_overview",
+        "add_iqc_standard",
+        "add_monitoring_km",
+        "enhance_summary"
+      ],
+      "original_slides": 5,
+      "final_slides": 16,
+      "master_preserved": true,
+      "duration_seconds": 0.21
+    },
+    {
+      "name": "N160JCN-EEK project 1pcs NG sample analysis report 260810",
+      "status": "success",
+      "input": "N160JCN-EEK project 1pcs NG sample analysis report 260810.pptx",
+      "output": "N160JCN-EEK project 1pcs NG sample analysis report 260810_improved.pptx",
+      "original_score": 55.5,
+      "original_grade": "F",
+      "actions": [
+        "add_analysis_method",
+        "add_evidence_checklist",
+        "add_5_why",
+        "add_control_group",
+        "add_evidence",
+        "add_statistical",
+        "add_prevention_overview",
+        "add_iqc_standard",
+        "add_monitoring_km",
+        "enhance_summary"
+      ],
+      "original_slides": 9,
+      "final_slides": 18,
+      "master_preserved": true,
+      "duration_seconds": 0.5
+    }
+  ]
+}

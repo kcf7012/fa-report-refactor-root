@@ -1,0 +1,24 @@
+{
+  "execution_status": "success",
+  "timestamp": "2026-08-31T16:29:28.429663",
+  "input_file": "/home/elan/fa-report-refactor/report/N160JCN-EEK project 1pcs NG sample analysis report 260810.pptx",
+  "output_file": "/home/elan/fa-report-refactor/report/N160JCN-EEK project 1pcs NG sample analysis report 260810_improved.pptx",
+  "original_slide_count": 9,
+  "final_slide_count": 18,
+  "master_preserved": true,
+  "duration_seconds": 0.5,
+  "actions": [
+    "add_analysis_method",
+    "add_evidence_checklist",
+    "add_5_why",
+    "add_control_group",
+    "add_evidence",
+    "add_statistical",
+    "add_prevention_overview",
+    "add_iqc_standard",
+    "add_monitoring_km",
+    "enhance_summary"
+  ],
+  "total_score_before": 55.5,
+  "grade_before": "F"
+}
