@@ -1,7 +1,8 @@
-# FA Report Improvement Skill — 設計對比:v2.3 vs v3.0
+# FA Report Improvement Skill — 設計對比:v2.3 vs v3.0 / v3.0.1
 
 > **目的**:用具體範例展示新版面設計原則帶來的差異
 > **比較對象**:本次 session 改善的 3 份報告
+> **狀態**:✅ v3.0 設計全部實現於 v3.0.0,v3.0.1 補充 .ppt 轉換與 pre-commit
 
 ---
 

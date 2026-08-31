@@ -367,9 +367,9 @@ def test_prevention_no_layout_modification():
 
 ---
 
-**整合進度**:
+**整合進度**:✅ **已全部完成**
 - 此設計與 `04_summary_design.md` 一致,同樣遵守「一張投影片一個主題」原則
-- 程式碼實作在 v3.0 Phase 4(樣板系統)完成
-- 樣板 JSON 範例已提供,可直接用於實作
+- 程式碼實作於 `src/fa_improver/improvers/prevention.py` + 樣板 `src/fa_improver/templates/builtin/prevention_overview.json`
+- 樣板 JSON 已實作並加入 `TimelineGenerator` 視覺元素
 
-**下一步**:撰寫 `06_template_system.md`,把 Summary + 對策的拆解設計形式化為統一樣板系統。
+詳見 `docs/10_api_reference.md` § 6 樣板系統 + 技能包 `CHANGELOG.md` v3.0.0 條目。

@@ -295,9 +295,10 @@ def test_summary_enhancement_preserves_master():
 
 ---
 
-**整合進度**:
+**整合進度**:✅ **已全部完成**
 - 此設計原則已納入 `02_refactor_plan.md` 的「第四原則:版面呼吸感」
-- 程式碼實作計畫在 v3.0 Phase 4(樣板系統)一併完成
-- 測試覆蓋會在 v3.0 Phase 5(品質提升)加入
+- 程式碼實作於 `src/fa_improver/templates/builtin/summary.json`(樣板系統 v3.0)
+- `SummaryImprover` 在 v3.0 + 樣板系統一併完成
+- 測試在 `tests/unit/test_new_improvers.py`(v3.0 Phase 4.5)
 
-**下一步**:撰寫 `05_template_system.md`,把這個設計原則形式化成可配置的 JSON 樣板。
+詳見 `docs/10_api_reference.md` § 6 樣板系統 + 技能包 `CHANGELOG.md` v3.0.0 條目。

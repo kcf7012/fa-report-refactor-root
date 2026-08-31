@@ -2,6 +2,7 @@
 
 > **目的**:統一所有「把一張擠在一起的投影片展開為多張」的模式
 > **適用對象**:Summary、根因分析、改善對策、基本資訊等所有可展開的區塊
+> **狀態**:✅ 設計原則已實作為 5 種視覺元素(checklist / flow / table / progress / timeline)於 `src/fa_improver/visuals/base.py`
 
 ---
 
