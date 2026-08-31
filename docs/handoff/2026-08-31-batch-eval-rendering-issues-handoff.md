@@ -3,7 +3,7 @@
 > 建立日期:2026-08-31
 > 對象:未來接手 Agent / 維護者
 > 工作目錄:`/home/elan/fa-report-refactor/.agents/skills/fa-report-improvement/`
-> **狀態**:🔴 已記錄,**待新 session 修正**(暫不做修改)
+> **狀態**:🟢 **已修正**(v3.1.1,2026-08-31)— 詳見 § 10 修正記錄
 
 ## 1. 背景
 
@@ -387,4 +387,106 @@ def test_no_empty_slides(sample_pptx, sample_eval_json, tmp_path):
 
 ---
 
-**⚠️ 重要**:本檔記錄的是**問題清單與分析**,**未做修改**。新 session 接手時請先讀本檔,再決定修正策略。
+## 10. 修正記錄(v3.1.1,2026-08-31)
+
+### 10.1 修正策略
+
+依照 Step 1-5 依序修正:
+1. **Step 1:診斷** — 加 debug logging(`FA_IMPROVER_DEBUG=1` 開啟)找出 P0 空白頁真凶
+2. **Step 2:修座標** — orchestrator 計算 `slide_width_inch` / `slide_height_inch` 傳給 improvers
+3. **Step 3:加 try/except + else: warning** — 防止未來 silently skip
+4. **Step 4:逐步測試** — 重跑 3 份報告驗證
+5. **Step 5:加 smoke test** — 7 個測試防止再次發生
+
+### 10.2 實際找到的真凶(P0 空白頁)
+
+**不只是「函式 silently fail」**,而是有 4 個 action 被 `build_plan()` 加入但 `_execute_action()` 沒有對應 elif 分支:
+
+```python
+# build_plan() 會加入這些 action:
+SlideAction.ADD_ROOT_CAUSE_CONTROL_GROUP     # SEVERE 時加入
+SlideAction.ADD_ROOT_CAUSE_EVIDENCE          # SEVERE 時加入
+SlideAction.ADD_IQC_STANDARD                 # PREVENTION < 85 時加入
+SlideAction.ADD_MONITORING_KM                # PREVENTION < 85 時加入
+
+# 但 _execute_action() 原本沒有這些 elif
+# 結果:slide 被 add_slide() 建立後,什麼內容都沒加進去 → 空白頁
+```
+
+3 份報告都觸發這些 action,所以合計產生 8 張空白頁。
+
+### 10.3 修正內容
+
+#### 新增檔案
+1. `src/fa_improver/improvers/_logging.py` — 統一 logger + `log_action()` 上下文管理器
+2. `tests/integration/test_slide_rendering.py` — 7 個 smoke test
+
+#### 修改檔案(10個)
+1. `src/fa_improver/improvers/orchestrator.py`
+   - 讀取 pptx 實際 `slide_width` / `slide_height` 存為實例變數
+   - 計算 `slide_bounds` 字典傳給每個 improver
+   - 補上 4 個 missing action 的 elif 分支
+   - 加 `try/except` 包住每個 action(單一失敗不中斷整個批次)
+   - 加 `else: warning` 標記未實作的 action
+
+2. `src/fa_improver/improvers/basic_info.py`
+   - 加 `slide_bounds` 參數支援動態座標
+   - 修 bug:傳 `Inches(margin)` 給 generator(應傳 float)
+
+3. `src/fa_improver/improvers/analysis_method.py`
+   - 加 `slide_bounds` 參數支援動態座標
+
+4. `src/fa_improver/improvers/evidence_checklist.py`
+   - 加 `slide_bounds` 參數支援動態座標
+
+5. `src/fa_improver/improvers/problem_definition.py`
+   - 加 `slide_bounds` 參數支援動態座標
+
+6. `src/fa_improver/improvers/prevention.py`
+   - 加 `slide_bounds` 參數支援動態座標
+   - 新增 `add_iqc_standard_slide()`(原本 missing action)
+   - 新增 `add_monitoring_km_slide()`(原本 missing action)
+   - 新增 `_add_prevention_subtype_slide()` helper
+   - 修 bug:傳 `Inches()` 給 TimelineGenerator 與 ComparisonTableGenerator
+
+7. `src/fa_improver/improvers/root_cause.py`
+   - 加 `slide_bounds` 參數支援動態座標
+   - 新增 `add_5why_slide()` 統一 5_why / control_group / evidence 三個變體
+   - 修 bug:傳 `Inches()` 給 FlowDiagramGenerator 與 ComparisonTableGenerator
+   - `_add_5why_flow_diagram()` 向後相容 `(slide, suggestions)` 與 `(slide, suggestions, content_w)`
+
+8. `src/fa_improver/improvers/summary.py`
+   - 加 `slide_bounds` 參數支援動態座標
+   - 修 Executive Summary / Key Improvements 座標:從 hard-coded `Inches(7.5)` 改成動態右對齊(`content_w - tb_w + 0.5`)
+
+### 10.4 驗證結果
+
+#### 測試
+| 指標 | v3.1.0 | v3.1.1 |
+|------|--------|--------|
+| Unit test | 203 passed + 3 skipped | 203 passed + 3 skipped ✅(不變) |
+| **新增 smoke test** |0 | **7 passed** ✅ |
+| **總計** | 203 + 3 skipped | **210 + 3 skipped** |
+| 覆蓋率 | 87% | **89%** |
+| Ruff | 通過 | 通過 ✅ |
+
+#### 真實批次執行
+
+| 報告 | 原始 pptx | v3.1.0 產出 | v3.1.1 產出 |
+|------|---------|--------------|---------------|
+| 260811 (10×7.5) | 5 張 | 11 張(**3 空白**) | **13 張(全 OK)** ✅ |
+| MS (13.33×7.5) | 5 張 | 12 張(**2 空白**) | **16 張(無新增空白)** ✅ |
+| N160JCN (13.33×7.5) | 9 張 | 14 張(**3 空白**) | **18 張(無新增空白)** ✅ |
+
+**原本 8 張空白頁全部消失**(因 4 個原本 silently skip 的 action 現在都有實作)。
+
+### 10.5 未修正項目(已標記為 P2)
+
+以下問題**本次未修**,計畫於 v3.2.0+ 處理:
+- **🟢 MS 原圖 slide 1 的「Prepared by: ELAN」shape** 在 `(6.65, 5.99)` 接近右邊界 — 屬 pptx 原始母片設計,非生成 bug
+- **🟢 母片覆蓋(文字被裝飾區蓋到)** — 需先重新設計 pptx 母片,改座標會破壞現有配置
+- **🟢 文字直式排版(autofit)** — textbox 已動態 >= 4 in,但若母片設計特殊仍可能觸發
+
+---
+
+**⚠️ 重要**:本檔記錄的是**問題清單 + 分析 + 修正記錄**。v3.1.1 已修正所有 P0/P1 問題,P2 留待未來處理。

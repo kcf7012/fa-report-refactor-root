@@ -1,31 +1,23 @@
 {
   "execution_status": "success",
-  "timestamp": "2026-08-30T20:13:55.009922",
-  "input_file": "/home/elan/fa-report/report/260811_Kobo_ZHT_RA6080_SPcomFailI.pptx",
-  "output_file": "/home/elan/fa-report/report/260811_Kobo_ZHT_RA6080_SPcomFailI_improved.pptx",
-  "added_slides": [
-    {
-      "dimension": "基本資訊完整性",
-      "index": 2,
-      "suggestions_count": 1
-    },
-    {
-      "dimension": "根因分析",
-      "index": 5,
-      "suggestions_count": 4
-    },
-    {
-      "dimension": "改善對策",
-      "index": 6,
-      "suggestions_count": 1
-    }
+  "timestamp": "2026-08-31T16:29:27.677126",
+  "input_file": "/home/elan/fa-report-refactor/report/260811_Kobo_ZHT_RA6080_SPcomFailI.pptx",
+  "output_file": "/home/elan/fa-report-refactor/report/260811_Kobo_ZHT_RA6080_SPcomFailI_improved.pptx",
+  "original_slide_count": 5,
+  "final_slide_count": 13,
+  "master_preserved": true,
+  "duration_seconds": 0.19,
+  "actions": [
+    "add_basic_info",
+    "add_analysis_method",
+    "add_evidence_checklist",
+    "add_5_why",
+    "add_statistical",
+    "add_prevention_overview",
+    "add_iqc_standard",
+    "add_monitoring_km",
+    "enhance_summary"
   ],
-  "dimensions_improved": [
-    "基本資訊完整性",
-    "根因分析",
-    "改善對策"
-  ],
-  "errors": [],
-  "summary_applied": true,
-  "figure_captions_improved": true
+  "total_score_before": 63.5,
+  "grade_before": "D"
 }
