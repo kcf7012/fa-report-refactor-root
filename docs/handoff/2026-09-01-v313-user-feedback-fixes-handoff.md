@@ -192,5 +192,67 @@
 
 ---
 
+## 11. 後續文件更新(2026-09-02 完成)
+
+v3.1.3 主發布後,Kenny 進一步檢視發現 3 個文件調整需求(無新程式碼變動):
+
+### 11.1 CHANGELOG 補遺
+
+- **新增 v3.1.2 條目**(原本 v3.1.3 與 v3.1.0 之間被跳過)—含 4 大 Bug 修正記錄、統計、真實批次表
+- **v3.1.0 補「📈 效益」段落**(原本只有「測試數據」)—補上 5 個面向:安全性 / 可靠性 / 可維護性 / UX / 測試
+- **「標籤」段改為表格**:加 v3.1.3、補 v3.1.2、v3.1.1 加註「已被 v3.1.2 取代」
+
+**Commit hash**(技能包倉庫):`b6d52d0`
+
+### 11.2 根倉庫 `.gitignore` 排除測試產物
+
+- `report/*_vq*.pptx` — 由 `tests/integration/test_visual_quality.py` 生成的 7 種測試產物
+- `report/*_improved_visual/` — 由 `scripts/visual_smoke_test.py` 生成的既有 v3.1.2 視覺驗證圖目錄
+
+**Commit hash**(根倉庫):`0deb924`
+
+### 11.3 日期修正教訓
+
+- **AGENTS.md § 6.1 規則**「修改代碼前確認今天日期」應同時適用於「**文件更新前**」
+- 當天工作日是 **2026-09-02**(Wed),不是 2026-09-01
+- 初次 commit 時所有 v3.1.3 文件寫成 2026-09-01,Kenny 即時提醒後修正
+- **未來最佳實踐**:在任何 `git commit` 之前,跑一次 `date "+%Y-%m-%d"` 確認當天日期
+
+---
+
+## 12. 保護機制與方法論總結
+
+### 12.1 一句話總結
+
+> v3.1.3 從「程式能跑」升級為「使用者看了真的覺得改善」。
+
+### 12.2 5 個關鍵保護機制(防止下次重蹈覆轍)
+
+| 機制 | 位置 | 效果 |
+|------|------|------|
+| `TITLE_SAFE_LEFT_INCH = 1.2` 常數 | `src/fa_improver/improvers/_safe_shape.py` | 統一 title 左邊界,不被裝飾擋住 |
+| `BODY_MIN_HEIGHT_INCH = 1.0` 常數 | `src/fa_improver/improvers/_safe_shape.py` | 統一 body 最小高度,避免內容溢出 |
+| `include_dimension_chart` opt-in | `src/fa_improver/improvers/summary.py` | 預設關閉6 維度圖,符合用戶意願 |
+| 4 個視覺回歸測試 | `tests/integration/test_visual_quality.py` | 抓 shape XML 就能驗證版面,不需 pptx 轉圖 |
+| `scripts/visual_smoke_test.py` | 視覺驗證腳本 | 把 pptx 轉 PNG,**強制人工目測**(無法只靠單元測試) |
+
+### 12.3 v3.1.1 → v3.1.3 的關鍵教訓
+
+> 「單元測試全綠 ≠ 改善完成」
+
+| 版本 | 工作流程 | 結果 |
+|------|---------|------|
+| **v3.1.0** | 只跑 pytest | 8 張空白投影片 → Kenny 用截圖抓包 |
+| **v3.1.1** | 加 smoke test(測 shape 位置) | 通過,但仍有 4 大類殘留問題(疊加/旋轉/殘留) |
+| **v3.1.2** | 加視覺回歸測試(抓 XML 屬性) | 215 個測試通過,但**未實際轉圖驗證** |
+| **v3.1.3** | **加 LibreOffice → PNG → 人工逐頁確認** | 3 大用戶回饋問題全部修正,53 張 PNG 人工檢查通過 |
+
+**核心方法論**:測試只能驗證「程式邏輯正確」,**無法驗證「視覺輸出正確」**。必須搭配:
+1. **視覺回歸測試**(抓 XML 屬性,單元測試能跑)
+2. **視覺驗證腳本**(`visual_smoke_test.py`,轉 PNG)
+3. **用戶截圖驅動修正**(Kenny 提供 36 張截圖,才是事實來源)
+
+---
+
 ✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md`
-   包含:10 個區塊,3 大 Bug 修正記錄,關鍵檔案與位置,給未來 session 的建議,完整統計
+   包含:12 個區塊,3 大 Bug 修正記錄,關鍵檔案與位置,給未來 session 的建議,完整統計,後續文件更新記錄,保護機制與方法論總結
