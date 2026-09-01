@@ -1,0 +1,25 @@
+{
+  "execution_status": "success",
+  "input_file": "/mnt/c/Users/Elan/Desktop/fa_report/MS_Meishan_ADO_445239_260716.pptx",
+  "output_file": "/home/elan/fa-report-refactor/report/MS_Meishan_v313_improved.pptx",
+  "original_slide_count": 5,
+  "final_slide_count": 18,
+  "master_preserved": true,
+  "duration_seconds": 0.24106574058532715,
+  "actions": [
+    "add_basic_info",
+    "add_problem_definition",
+    "add_analysis_method",
+    "add_evidence_checklist",
+    "add_5_why",
+    "add_control_group",
+    "add_evidence",
+    "add_statistical",
+    "add_prevention_overview",
+    "add_iqc_standard",
+    "add_monitoring_km",
+    "enhance_summary"
+  ],
+  "total_score_before": 41.5,
+  "grade_before": "F"
+}

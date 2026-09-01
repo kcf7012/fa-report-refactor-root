@@ -1,0 +1,22 @@
+{
+  "execution_status": "success",
+  "input_file": "/mnt/c/Users/Elan/Desktop/fa_report/260811_Kobo_ZHT_RA6080_SPcomFailI.pptx",
+  "output_file": "/home/elan/fa-report-refactor/report/260811_Kobo_v313_improved.pptx",
+  "original_slide_count": 5,
+  "final_slide_count": 15,
+  "master_preserved": true,
+  "duration_seconds": 0.19816827774047852,
+  "actions": [
+    "add_basic_info",
+    "add_analysis_method",
+    "add_evidence_checklist",
+    "add_5_why",
+    "add_statistical",
+    "add_prevention_overview",
+    "add_iqc_standard",
+    "add_monitoring_km",
+    "enhance_summary"
+  ],
+  "total_score_before": 63.5,
+  "grade_before": "D"
+}

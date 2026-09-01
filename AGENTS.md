@@ -4,7 +4,7 @@
 >
 > 本檔規範 agent 在 `/home/elan/fa-report-refactor/` 的行為、慣例、與可用工具。
 >
-> ⚠️ **今天日期**:2026-08-31(請勿使用其他日期寫入文件,特別是 handoff 與 CHANGELOG)
+> ⚠️ **今天日期**:2026-09-02(請勿使用其他日期寫入文件,特別是 handoff 與 CHANGELOG)
 
 ---
 
@@ -14,12 +14,12 @@
 |------|-----|
 | **名稱** | fa-report-refactor |
 | **用途** | 半導體 FA(Failure Analysis)報告智慧化改善工具 |
-| **當前版本** | v3.1.0(2026-08-31) |
+| **當前版本** | v3.1.3(2026-09-02) |
 | **Git 倉庫** | 雙倉庫架構(根倉庫 + 技能包子倉庫) |
 | **主語言** | Python ≥ 3.10 |
 | **套件管理** | uv 0.12.7+(取代 pip + venv) |
 | **測試框架** | pytest + pytest-cov |
-| **測試結果** | 203 passed + 3 skipped,覆蓋率 **90%** |
+| **測試結果** | 219 passed + 3 skipped,覆蓋率 **90%** |
 | **Lint** | ruff + black(由 pre-commit 自動執行) |
 | **主入口** | `.agents/skills/fa-report-improvement/src/fa_improver/cli.py` |
 
@@ -126,7 +126,10 @@ fa-report-refactor/
 
 ### 4.4 理解歷史決策
 9. ~~`docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md` — 8 項 v3.1+ 未完成項清單~~(已全部完成,參考 § 十一)
-10. `docs/PHASE2-5_TODO.md` — 歷史任務清單(已全部 ✅ 完成,但有誠實標記的差距)
+10. `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md` — v3.1.3 用戶回饋 3 個版面問題修正記錄 ⭐(最新)
+11. `docs/handoff/2026-09-01-v312-final-fixes-handoff.md` — v3.1.2 修 v3.1.1 殘留 4 大渲染問題
+12. `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md` — v3.1.1 未完成項揭露
+13. `docs/PHASE2-5_TODO.md` — 歷史任務清單(已全部 ✅ 完成,但有誠實標記的差距)
 
 ---
 

@@ -720,3 +720,55 @@ options:
 | `OPENAI_BASE_URL` | (無) | 自訂 endpoint |
 | `FA_IMPROVER_LLM_TIMEOUT` | `60` | HTTP 請求超時(秒) |
 | `FA_IMPROVER_LLM_MAX_RETRIES` | `3` | 最大重試次數 |
+
+---
+
+## 📋 v3.1.0+ 新增 CLI 參數補充
+
+> 本節為 v3.1.0、v3.1.2、v3.1.3 新增的 CLI 參數補充說明
+
+| 參數 | 版本 | 說明 |
+|------|------|------|
+| `--api-key` | v3.1.0+ | OpenAI API key(優先於 `OPENAI_API_KEY` 環境變數與 `.env` 檔案) |
+| `--redact-pii` | v3.1.0+ | 在送出 LLM 前遮罩個資(電話/Email/中文姓名/IP/工號/身分證/信用卡) |
+| `--base-url` | v3.1.0+ | 自訂 API endpoint(用於 OpenAI 相容介面如 Groq、OpenRouter) |
+| `--include-dimension-chart` | v3.1.3+ | opt-in 加入「6 維度評分分析」slide(預設關閉,符合 Kenny 2026-09-02 回饋) |
+
+### 範例:v3.1.3 預設(不含6 維度圖)
+
+```bash
+uv run python -m fa_improver report.pptx \
+  --eval eval.json \
+  --output improved.pptx
+```
+
+### 範例:opt-in 加入6 維度圖
+
+```bash
+uv run python -m fa_improver report.pptx \
+  --eval eval.json \
+  --include-dimension-chart \
+  --output improved.pptx
+```
+
+### 範例:v3.1.0 個資遮罩
+
+```bash
+uv run python -m fa_improver report.pptx \
+  --llm-provider openai \
+  --redact-pii \
+  --api-key sk-xxx \
+  --output improved.pptx
+```
+
+---
+
+## 🛡️ v3.1.3 版面優化(Kenny 2026-09-02 回饋)
+
+v3.1.3 解決了3 個用戶回饋的版面問題:
+
+1. **簡報標題偏左**:title 從 left=0.5 in 改為 left=1.2 in,避免被母片左上裝飾(0.54-0.97 in)擋住
+2. **標題與內容重疊**:當 layout 的 body placeholder 高度 < 1.0 in 時,fallback 用 safe_textbox(高度 = slide高 - 2.0)
+3. **移除6 維度評分分析**:預設不再產生此 slide(用戶回饋對終端用戶無實質幫助)
+
+詳見 `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md`。
