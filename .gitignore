@@ -93,3 +93,10 @@ report/*_vqdim_optin.pptx
 report/*_improved_visual/
 
 # 臨時交接文檔(任務完成後可刪除)
+
+# Playwright CLI 工作目錄(session / snapshot / screenshot 等)
+.playwright-cli/
+
+# Playwright 操作截圖(放進 repo 作為 PR/Merge 教學文件的引用資源,但本地重新操作會再生)
+# 注意:docs/handoff/screenshots/ 內的截圖是「教學文件的一部分」,刻意 commit 進去
+#       只有 .playwright-cli/ 是 agent 操作過程的暫存,不該 commit
