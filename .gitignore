@@ -100,3 +100,10 @@ report/*_improved_visual/
 # Playwright 操作截圖(放進 repo 作為 PR/Merge 教學文件的引用資源,但本地重新操作會再生)
 # 注意:docs/handoff/screenshots/ 內的截圖是「教學文件的一部分」,刻意 commit 進去
 #       只有 .playwright-cli/ 是 agent 操作過程的暫存,不該 commit
+
+# v3.1.4-regression-fix 改善過程的中間產物(僅 v3_final 是最終版)
+report/*_regression_improved.pptx
+report/*_regression_v2_improved.pptx
+# Kenny 上傳 Google 雲端的驗收副本(不該 commit 到 repo,Kenny 本地保留)
+report/*_v3_final_improved.pptx
+report/*.manifest.json

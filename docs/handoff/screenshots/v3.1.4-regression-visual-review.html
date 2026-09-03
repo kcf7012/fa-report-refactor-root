@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>v3.1.4 標題偏左回歸修正 - 視覺驗收報告</title>
+  <style>
+body { font-family: -apple-system, "Microsoft JhengHei", sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+h1 { color: #333; border-bottom: 3px solid #0066cc; padding-bottom: 10px; }
+h2 { color: #0066cc; margin-top: 40px; padding: 12px; background: #e6f2ff; border-left: 5px solid #0066cc; border-radius: 4px; }
+.meta { background: #fff; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.checklist { background: #d4edda; color: #155724; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid #28a745; }
+.slide-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; }
+.slide-card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.slide-card img { width: 100%; height: auto; border: 1px solid #ccc; }
+.slide-card .label { margin-top: 10px; font-size: 14px; color: #555; text-align: center; font-weight: bold; }
+.tag-pass { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>🔍 v3.1.4 標題偏左回歸修正 - 視覺驗收報告</h1>
+
+<div class="meta">
+  <p><strong>驗收日期:</strong> 2026-09-03</p>
+  <p><strong>驗收對象:</strong> 3 份真實 FA 報告 v3.1.4-regression-fix 改善後 pptx</p>
+  <p><strong>修正內容:</strong> 全 7 個 improver 共 18 處 margin/left=0.5 → TITLE_SAFE_LEFT_INCH - 0.2(=1.0 in)</p>
+  <p><strong>CI 狀態:</strong> Run #25 <span class="tag-pass">5/5 jobs success</span> | main HEAD: <code>6e4089b</code></p>
+  <p><strong>總計:</strong> 53 張截圖(260811: 15 張 / MS: 18 張 / N160JCN: 20 張)</p>
+</div>
+
+<div class="checklist">
+  <h3 style="margin-top:0">驗收 checklist</h3>
+  <p>每張截圖人工確認以下 3 項:</p>
+  <ol style="margin-bottom:0">
+    <li><strong>標題對齊:</strong> 標題從 1.20 in 開始,checkbox 從 1.00 in 開始,D1-D8 文字從 1.35 in 開始(三者對齊)</li>
+    <li><strong>無 6 維度評分分析 slide:</strong> 3 份報告最後一頁都應該是 Thank You 或 Executive Summary</li>
+    <li><strong>內容不被裝飾擋住:</strong> 所有內容從 1.0 in 起,不被母片左上裝飾(0.54-0.97 in)擋住</li>
+  </ol>
+</div>
+
+<div>
+  <h2>📋 260811_Kobo_ZHT_RA6080_SPcomFailI(原始 5 張 → 改善後 15 張 | 母片含「直排」layout)</h2>
+  <div class="slide-grid">
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-01.png"><div class="label">封面</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-02.png"><div class="label">slide-02</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-03.png"><div class="label">slide-03</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-04.png"><div class="label">slide-04</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-05.png"><div class="label">slide-05</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-06.png"><div class="label">slide-06</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-07.png"><div class="label">slide-07</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-08.png"><div class="label">slide-08</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-09.png"><div class="label">slide-09</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-10.png"><div class="label">slide-10</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-11.png"><div class="label">slide-11</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-12.png"><div class="label">slide-12</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-13.png"><div class="label">slide-13</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-14.png"><div class="label">slide-14</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/260811_v3_final_improved_visual/slide-15.png"><div class="label">slide-15</div></div>
+  </div>
+</div>
+
+<div>
+  <h2>📋 MS_Meishan_ADO_445239_260716(原始 5 張 → 改善後 18 張 | 母片含左上裝飾)</h2>
+  <div class="slide-grid">
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-01.png"><div class="label">封面</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-02.png"><div class="label">slide-02</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-03.png"><div class="label">slide-03</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-04.png"><div class="label">slide-04</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-05.png"><div class="label">slide-05</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-06.png"><div class="label">slide-06</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-07.png"><div class="label">slide-07</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-08.png"><div class="label">slide-08</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-09.png"><div class="label">slide-09</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-10.png"><div class="label">slide-10</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-11.png"><div class="label">slide-11</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-12.png"><div class="label">slide-12</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-13.png"><div class="label">slide-13</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-14.png"><div class="label">slide-14</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-15.png"><div class="label">slide-15</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-16.png"><div class="label">slide-16</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-17.png"><div class="label">slide-17</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/MS_v3_final_improved_visual/slide-18.png"><div class="label">slide-18</div></div>
+  </div>
+</div>
+
+<div>
+  <h2>📋 N160JCN-EEK project 1pcs NG sample analysis report 260810(原始 9 張 → 改善後 20 張 | 母片無特殊 layout)</h2>
+  <div class="slide-grid">
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-01.png"><div class="label">封面</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-02.png"><div class="label">slide-02</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-03.png"><div class="label">slide-03</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-04.png"><div class="label">slide-04</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-05.png"><div class="label">slide-05</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-06.png"><div class="label">slide-06</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-07.png"><div class="label">slide-07</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-08.png"><div class="label">slide-08</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-09.png"><div class="label">slide-09</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-10.png"><div class="label">slide-10</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-11.png"><div class="label">slide-11</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-12.png"><div class="label">slide-12</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-13.png"><div class="label">slide-13</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-14.png"><div class="label">slide-14</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-15.png"><div class="label">slide-15</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-16.png"><div class="label">slide-16</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-17.png"><div class="label">slide-17</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-18.png"><div class="label">slide-18</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-19.png"><div class="label">slide-19</div></div>
+    <div class="slide-card"><img src="/home/elan/fa-report-refactor/report/N160JCN_v3_final_improved_visual/slide-20.png"><div class="label">slide-20</div></div>
+  </div>
+</div>
+</body></html>
