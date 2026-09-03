@@ -2,8 +2,8 @@
 
 > 半導體 **F**ailure **A**nalysis(FA)報告的智慧化改善工具集
 
-[![Version](https://img.shields.io/badge/version-v3.1.3-blue)]()
-[![Tests](https://img.shields.io/badge/tests-219%20passed-success)]()
+[![Version](https://img.shields.io/badge/version-v3.1.4-blue)]()
+[![Tests](https://img.shields.io/badge/tests-233%20passed-success)]()
 [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
