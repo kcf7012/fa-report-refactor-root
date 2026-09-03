@@ -4,6 +4,55 @@
 > 稽核者：柔伊（肯尼大 的 Mac 上跑的 Claude Code assistant），透過 `gh repo clone` 遠端稽核，沒有實際碰到 Windows 本機檔案
 > 日期：2026-09-02
 
+---
+
+## 🟢 狀態更新：2026-09-03 v3.1.4 已全部修正
+
+**依據**：`docs/handoff/2026-09-03-audit-remediation-plan-handoff.md` 計畫，Kenny 拍板後已全部完成。
+
+### 修正完成（6 項發現中 4 項完整解決）
+
+| # | 發現 | 修法 | 狀態 |
+|---|------|------|------|
+| 1 | CI 自 08-31 起幾乎每個 commit 都紅燈 | ruff format 修了 + pre-commit 升級 v0.1.9→v0.16.5 | ✅ **Run #23 5/5 jobs success** |
+| 2 | 16 個視覺回歸測試在 CI 完全不跑 | 新增 3 個去識別化合成 pptx + `_fixture_resolver.py` | ✅ **CI 真在跑 16 個** |
+| 3 | `conftest.py` fixture 陷阱（`Path("")`） | fixture 改回傳 `None` + 13 處呼叫端改判斷 | ✅ **全新 clone 0 fail** |
+| 4 | 5-Why 流程圖內容 bug | 新增 `_truncate_step_text()` helper + 重寫 fallback 邏輯 | ✅ **14 個新單元測試全綠** |
+| 5 | 版本號 3 處未同步 | `pyproject.toml` + `__init__.py` + `SKILL.md` → 3.1.4 | ✅ **v3.1.4 release 完成** |
+| 6 | CHANGELOG 標籤表失真 | 重寫表格（加 GitHub Release 與本地 tag 兩欄） | ✅ **v3.1.4 release 完成** |
+
+### 未來 release 待辦（降級為 backlog）
+
+| # | 項目 | 狀態 |
+|---|------|------|
+| 稽核 #3 待確認 1 | `_safe_shape.py::get_title_placeholder()` 第 158-170 行死碼 | 🔵 backlog |
+| 稽核 #3 待確認 2 | 旋轉/直排偵測只認字串 `"直排"`/`"Vertical"`，遇「垂直/縱向/Portrait」會失效 | 🔵 backlog |
+| 稽核 #3 待確認 3 | 視覺驗證覆蓋面窄（`find_content_layout()` 每份報告共用 1 個 layout） | 🔵 backlog |
+
+### 驗證結果
+
+- **本機**：`233 passed, 3 skipped`（基線 219 + 14 新測試）
+- **模擬 CI**（`FA_REPORT_PROJECT_ROOT=/nope/1`）：`233 passed, 3 skipped`，16 個視覺回歸測試真在跑（用合成 fixture），0 fail
+- **CI Run #21**（合併後）：**5/5 jobs success** 含 Build Distribution
+- **CI Run #23**（最終）：**5/5 jobs success**
+
+### v3.1.4 Release
+
+- **GitHub Release**：https://github.com/kcf7012/fa-report-refactor/releases/tag/v3.1.4
+- **PR #1**：https://github.com/kcf7012/fa-report-refactor/pull/1
+- **Tag**：`v3.1.4` → commit `5cb68a4`
+- **改善計畫**：https://github.com/kcf7012/fa-report-refactor-root/blob/main/docs/handoff/2026-09-03-audit-remediation-plan-handoff.md
+
+### 關鍵教訓（已實踐）
+
+> 單元測試全綠 ≠ 改善完成（v3.1.3 handoff 已記）
+> 測試在自己機器全綠 ≠ 這個驗證機制對其他人有效（本稽核新揭露）
+> 往後每次宣稱「已修正」之前，問：這個結論拿到一台全新環境重跑，還會不會成立？
+
+**稽核本身的目的已達成**——6 項發現完整處理，且測試機制本身也升級（不再依賴本機專屬檔案、不再被舊版 ruff 誤導）。✅ 稽核生命週期閉環。
+
+---
+
 ## 1. 目前任務目標
 
 肯尼大 要求對 `fa-report-refactor`（技能包）+ `fa-report-refactor-root`（handoff/文件倉庫）的 v3.1.2、v3.1.3 修正做一次「不採信 handoff 自述、實際查證」的獨立稽核，找出 Pi Agent 自己都沒發現的遺漏或未完成事項。起因：v3.1.1 版本曾被 Pi Agent 誤標「已修正」，實際還有 4 個視覺渲染 bug 沒修，這次要確認 v3.1.2/v3.1.3 是不是又重演了同一種「沒查證就宣稱完成」的模式。

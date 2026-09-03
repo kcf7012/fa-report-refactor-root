@@ -4,9 +4,10 @@
 > 拍板日期:2026-09-03(Kenny 已回覆 4 項決策)
 > 對象:Kenny + v3.1.4 接手 Agent
 > 工作目錄:`/home/elan/fa-report-refactor`(根倉庫) + `.agents/skills/fa-report-improvement/`(技能包子倉庫,獨立 git)
-> **狀態**:🟢 **Kenny 已拍板,本計畫鎖定為 v3.1.4 執行藍圖,等待下個任務實際動工**
+> **狀態**:✅ **v3.1.4 已於 2026-09-03 完整執行並 release(本計畫閉環)**
 > **依據**:`docs/handoff/2026-09-02-fa-report-refactor-audit-handoff.md`(柔伊 遠端稽核報告)
 > **拍板結果摘要**:見 §10
+**執行結果摘要**:見 §10.6(2026-09-03 完成)
 
 ---
 
@@ -369,8 +370,71 @@ Kenny 在本次 session 回覆 4 項決策,Pi Agent 收到後:
 
 ---
 
-**完成確認**:
-✅ Handoff 文檔已寫入:`/home/elan/fa-report-refactor/docs/handoff/2026-09-03-audit-remediation-plan-handoff.md`
-   包含:10 個區塊、6 項稽核發現的事實彙整 + 計畫、3 項「待確認」處理、4 項「Kenny 拍板決策」已全部閉環、完整 v3.1.4 執行藍圖
-✅ Kenny 拍板已記錄,等待 git commit
-✅ 本次 session 未修改任何程式碼、未動任何 .py / pptx / 測試檔
+## 10.6 v3.1.4 執行結果摘要(2026-09-03 完成)
+
+> 本節記錄 v3.1.4 工作 session 的實際執行結果,用於閉環追蹤。
+
+### ✅ 完成的 4 項 Kenny 拍板決策
+
+| # | 決策 | 結果 |
+|---|------|------|
+| 1 | #2 視覺回歸測試:採方案 A(合成 pptx) | ✅ 完成 — 新增 3 個合成 fixture + `_fixture_resolver.py` |
+| 2 | #3 conftest fixture 改 None | ✅ 完成 — 13 處呼叫端修正,全新 clone 0 fail |
+| 3 | #4 5-Why fallback 重設計 | ✅ 完成 — `_truncate_step_text()` + 14 個新測試 |
+| 4 | #5 版本號從 v3.1.4 開始嚴格執行 | ✅ 完成 — pyproject + __init__ + SKILL.md 三處同步到 3.1.4 |
+
+### 📦 最終 commits(合併到 main)
+
+```
+5cb68a4 chore(pre-commit): 升級 ruff-pre-commit v0.1.9 → v0.16.5 與本機 ruff 對齊
+76f8efe docs: 版本號 v3.1.3 → v3.1.4 + CHANGELOG 新增條目與修正標籤表
+95f93e4 Merge pull request #1 from kcf7012/v3.1.4-audit-fixes
+5b48690 style: 修正 test_slide_rendering.py assert 格式(讓 CI ruff format check 通過)
+fc521fb style: 修正 6 個測試檔案的 import 排序(讓 CI ruff check 通過)
+27495b1 fix(tests): 視覺回歸測試改用合成 fixture,讓 CI 真在跑 16 個視覺回歸測試
+c87136f fix(improvers): 5-Why fallback 重設計 — 避免從字中間切與硬補通用佔位
+18bb4cd fix(tests): conftest fixture 找不到時改回 None,修正全新 clone 環境的 IsADirectoryError
+```
+
+### 🎯 驗證結果
+
+| 驗證項 | 結果 |
+|--------|------|
+| 本機 pytest | **233 passed, 3 skipped**(基線 219 + 14 新測試) |
+| 模擬 CI(`FA_REPORT_PROJECT_ROOT=/nope/1`) | **233 passed, 3 skipped**,0 fail |
+| CI Run #21(合併到 main 後) | **5/5 jobs success** |
+| CI Run #23(release commit + pre-commit 升級後) | **5/5 jobs success** |
+| ruff check | ✅ All checks passed |
+| ruff format --check | ✅ All 70 files formatted |
+| 母片保護測試 | ✅ 100%(本地 + CI 一致) |
+| 視覺回歸測試 CI | ✅ 16 個真在跑(用合成 fixture),不再是 skip |
+| Build Distribution CI | ✅ 從一直被 skip 變成正常執行 |
+
+### 🌐 v3.1.4 Release
+
+- **GitHub Release**:https://github.com/kcf7012/fa-report-refactor/releases/tag/v3.1.4
+- **PR #1**:https://github.com/kcf7012/fa-report-refactor/pull/1(已 merge + 分支刪除)
+- **Tag**:`v3.1.4` → commit `5cb68a4`(完整 main HEAD)
+- **稽核生命週期**:從「稽核發現問題」→「改善計畫拍板」→「分階段執行」→「CI 驗證」→ 「Release 公開」,完整閉環
+
+### 🔵 backlog(未來 release 待辦)
+
+從稽核報告的 3 項「待確認」降級:
+- 清理 `_safe_shape.py::get_title_placeholder()` 第 158-170 行死碼
+- 擴充旋轉/直排偵測的關鍵字覆蓋(目前只認 "直排" / "Vertical")
+- 視覺驗證流程適應新客戶母片模板(目前用 `find_content_layout()` 1 個 layout)
+
+### ⚠️ 額外發現:pre-commit hook 行為不一致
+
+本機 ruff 是 0.16.5,但 `.pre-commit-config.yaml` 的 `ruff-pre-commit` 用 v0.1.9——hook 修 import 排序的行為跟本機 ruff 不一致,造成 6 個檔案 import 排序錯誤被 commit 進去,CI 才抓到。已在 v3.1.4 升級到 v0.16.5 解決。
+
+**經驗教訓**:未來任何工具(lint/format/type-check)應該跟 CI 用同一個版本,避免 hook 跟 CI 行為分歧造成隱藏 bug。
+
+---
+
+**v3.1.4 計畫閉環確認**:
+✅ 4 項 Kenny 拍板決策全部執行完成
+✅ 8 個 commits 進入 main(v3.1.3 → v3.1.4)
+✅ CI 從 v3.1.3 的紅燈轉為 v3.1.4 的 5/5 success
+✅ v3.1.4 Release 公開、tag 已推送
+✅ 改善計畫文件閉環,可作為下個稽核週期的範本
