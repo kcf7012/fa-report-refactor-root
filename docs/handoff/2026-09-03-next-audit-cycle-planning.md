@@ -214,6 +214,7 @@ jobs:
 | 4 | 修 git history:`v3.0.0` / `v3.0.1` tag 本地有但 GitHub 沒 push(發版流程不完整) | 稽核 #6 | P2 | 1 小時(retag + push) |
 | 5 | 加 GitHub Actions `notify-failure.yml`(§3.1) | 本文件建議 | P2 | 1 小時 |
 | 6 | 加 GitHub Actions `monthly-audit-trigger.yml`(§3.2) | 本文件建議 | P2 | 1 小時 |
+| 7 | 自動截圖比對(SSIM, baseline 用上次 release)(§8) | 本文件 §8 | P2 | 1-2 天 |
 
 ---
 
@@ -263,7 +264,97 @@ jobs:
 
 ---
 
-## 8. 成功指標
+## 8. 新增 backlog:自動截圖比對(visual regression test)
+
+> Kenny 在 2026-09-03 提出:目前有「實質幾何測試」但**沒有自動截圖比對**,值得考慮。
+
+### 現況盤點
+
+**已有**:
+- ✅ `tests/integration/test_visual_quality.py`(9 個)+ `test_slide_rendering.py`(7 個)— 讀 pptx XML 屬性的實質測試
+- ✅ `scripts/visual_smoke_test.py` — libreoffice 把 pptx 轉 PNG(供人工 review)
+- ✅ Kenny 在 v3.1.3 時**手動**視覺驗證 53 張 PNG(`report/*_improved_visual/`)
+
+**沒有**:
+- ❌ 自動截圖比對(pixel diff vs baseline)
+- ❌ CI 自動跑 visual_smoke_test
+- ❌ Baseline PNG 進 repo
+
+### 設計方案選項
+
+#### 方案 A:pillow + numpy 做 pixel diff(簡單)
+
+```python
+# tests/integration/test_visual_regression.py
+import subprocess
+from pathlib import Path
+from PIL import Image
+import numpy as np
+
+BASELINE_DIR = Path("tests/visual_baselines")
+
+def test_no_visual_regression(input_pptx, baseline_stem):
+    # 1. 轉 pptx成PNG
+    subprocess.run(["libreoffice", "--headless", "--convert-to", "png",
+                    "--outdir", "/tmp", str(input_pptx)], check=True)
+    # 2. 與baseline比對
+    for slide_n in range(1, slide_count + 1):
+        actual = np.array(Image.open(f"/tmp/{input_pptx.stem}-slide-{slide_n}.png"))
+        baseline = np.array(Image.open(BASELINE_DIR / f"{baseline_stem}-slide-{slide_n}.png"))
+        diff = np.abs(actual.astype(int) - baseline.astype(int)).mean()
+        assert diff < 5.0, f"Slide {slide_n} 視覺差異 {diff:.2f} 超過閾值"
+```
+
+**優點**:簡單,只用 pillow + numpy(都已有)
+**缺點**:像素級 diff 對字型、anti-aliasing 極敏感,容易誤判
+
+#### 方案 B:Perceptual hash(pHash)(容錯)
+
+```python
+import imagehash
+from PIL import Image
+
+def test_visual_similarity(input_pptx, baseline_stem):
+    # pHash 容許小差異(anti-aliasing、字型微調)
+    ...
+```
+
+**優點**:對微小像素差異有容忍度,只偵測「結構性」變化
+**缺點**:需要 `pip install imagehash`,且 perceptual hash 對字型仍敏感
+
+#### 方案 C:SSIM(structural similarity)(推薦)
+
+```python
+from skimage.metrics import structural_similarity as ssim
+
+def test_visual_similarity(actual_img, baseline_img):
+    score = ssim(actual, baseline, channel_axis=2)
+    assert score > 0.95, f"SSIM {score:.3f} 過低"
+```
+
+**優點**:業界標準,模擬人眼對結構的感知
+**缺點**:需要 `pip install scikit-image`,且 baseline 維護成本高
+
+### 我的建議
+
+v3.1.5 先**不做自動截圖比對**,原因:
+
+1. **合成 fixture 已涵蓋主要場景** — 3 個 fixture 對應 3 種 layout,XML 屬性測試已抓 90% 的版面 bug
+2. **baseline 維護成本** — 每次 libreoffice 升級都可能讓 PNG 不一樣,要重新 record baseline
+3. **font rendering 在不同 OS 不同** — WSL/Linux libreoffice 跟 Windows PowerPoint 渲染差異大,CI 抓到的「差異」很多是 false positive
+4. **.gitignore 排除 *.pptx** — 連 pptx 都不能 commit,baseline PNG 也難管理
+
+**若 Kenny 真的要做**:選方案 C(SSIM),但 baseline 改用「上次 release 的視覺驗證圖」作參考,而不是逐張比對。
+
+### 加入 backlog
+
+```
+| 7 | 自動截圖比對(SSIM, baseline 用上次 release) | 本文件 §8 | P2 | 1-2 天 |
+```
+
+---
+
+## 9. 成功指標
 
 下一次稽核應該:
 
