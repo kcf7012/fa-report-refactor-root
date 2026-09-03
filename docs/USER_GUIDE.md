@@ -1,7 +1,7 @@
-# FA Report Improvement v3.0 — 使用手冊
+# FA Report Improvement — 使用手冊
 
 > **完整使用指南**:從安裝到進階應用,涵蓋所有使用情境
-> **版本**:v3.0.1(2026-08-31)
+> **當前版本**:v3.1.4(2026-09-03)+ v3.1.4-regression-fix(2026-09-04)
 > **適用對象**:FA 工程師、品管主管、研發團隊
 
 ---
@@ -771,4 +771,120 @@ v3.1.3 解決了3 個用戶回饋的版面問題:
 2. **標題與內容重疊**:當 layout 的 body placeholder 高度 < 1.0 in 時,fallback 用 safe_textbox(高度 = slide高 - 2.0)
 3. **移除6 維度評分分析**:預設不再產生此 slide(用戶回饋對終端用戶無實質幫助)
 
-詳見 `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md`。
+詳見 `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md`。v3.1.4 — 稽核修正 + CI 從紅轉綠 + 視覺回歸測試誠實化
+
+## 🚀 v3.1.4 版本說明
+
+### 對比 v3.1.3
+
+| 指標 | v3.1.3 | v3.1.4 |
+|------|--------|--------|
+| 測試通過 | 219 | **233**(+14:5-Why 新測試) |
+| 測試 skip | 3 | 3 |
+| 覆蓋率 | 90% | 90% |
+| ruff check | ✅ | ✅ |
+| ruff format | ❌(CI 自 08-31 起紅燈) | ✅ **稽核 #1 順手解決** |
+| CI Build Distribution | 一直被 skip | ✅ **v3.1.4 起重跑** |
+| CI 狀態 | ❌ 持續紅燈 | ✅ **5/5 jobs success** |
+| 視覺回歸測試 CI | ❌ 永遠 skip | ✅ **真在跑**(用合成 fixture) |
+
+### 4 大新功能/修正
+
+#### 1. conftest fixture 陷阱修正(`tests/conftest.py`)
+
+全新 clone 環境跑 `pytest tests/` 不再爆 `IsADirectoryError`。
+
+`sample_pptx/sample_eval_json/sample_eval_txt` 找不到檔案時改回傳 `None`(`Path | None`),13 處呼叫端從 `if not X.exists()` 改為 `if X is None`。
+
+#### 2. 5-Why fallback 重設計(`src/fa_improver/improvers/root_cause.py`)
+
+新增 `_truncate_step_text()` helper,中英文句號「。」與「.」都認;`suggestions` 非空時只截斷實際數量,空時才 fallback 到預設 5 步。
+
+新增 14 個單元測試於 `tests/unit/test_root_cause.py`。
+
+#### 3. 視覺回歸測試改用合成 fixture(讓 CI 真在跑 16 個)
+
+**新增**:
+
+- `scripts/build_synthetic_fixtures.py`:程式化產生 3 個完全去識別化合成 pptx
+  - `synthetic_A_vertical`:用 layout[9] "Title and Vertical Text"(含 "Vertical" 關鍵字)
+  - `synthetic_B_single_placeholder`:Blank layout + 0.3 in 小 textbox(觸發 BODY_MIN_HEIGHT)
+  - `synthetic_C_decoration`:母片含 LeftTopDecoration 矩形
+- `tests/integration/_fixture_resolver.py`:動態解析 fixture 路徑
+  - 環境變數 `FA_REPORT_PROJECT_ROOT` 覆蓋路徑(用 `:` 分隔)
+  - 找不到真實 pptx 時 fallback 到合成 fixture
+
+**改寫**:16 個視覺回歸測試(在 `test_visual_quality.py` + `test_slide_rendering.py`)改用 `resolve_input_pptx/resolve_eval_json`,從硬編 `Path("/home/elan/...")` 改為動態解析。
+
+**公開安全**:3 個合成 pptx 完全去識別化(無 ELAN logo、無真實客戶名稱、無機密文字),使用 python-pptx 預設母片 + 純灰底。
+
+#### 4. 版本號同步 + CHANGELOG + pre-commit 升級
+
+- 嚴格執行 v3.0.0→v3.1.0 發版 checklist(`pyproject.toml`、`__init__.py`、`SKILL.md` 三處 → 3.1.4)
+- `CHANGELOG.md` 新增 v3.1.4 條目 + 重寫標籤表(加 GitHub Release 與本地 tag 兩欄)
+- 升級 `.pre-commit-config.yaml` 的 ruff-pre-commit v0.1.9 → v0.16.5,與本機 ruff 對齊
+
+## 🛡️ v3.1.4-regression-fix 標題偏左回歸修正(2026-09-04)
+
+Kenny 2026-09-03 視覺驗收 v3.1.4 時回饋「標題又偏左」,2026-09-04 完成修正。
+
+### 對照檢查結果
+
+`grep -rn "margin = 0\.5" src/fa_improver/improvers/` 結果:
+
+```
+basic_info.py:67         - 需要修
+basic_info.py:135        - 不修(註解文字)
+summary.py:116, 163, 213 - 需要修
+root_cause.py:49, 236    - 需要修
+analysis_method.py:54    - 需要修
+evidence_checklist.py:54 - 需要修
+problem_definition.py:53 - 需要修
+prevention.py:46, 205    - 需要修
+```
+
+**8 個檔案,11 處 `margin = 0.5` 殘留**——v3.1.3 handoff 沒發現這個系統性問題。
+
+Helper 函式內部還有 8 處 `left=0.5` 寫死,獨立於頂層 margin 修改。
+
+### 修正策略
+
+用 `TITLE_SAFE_LEFT_INCH - 0.2 = 1.0` 而非 `TITLE_SAFE_LEFT_INCH = 1.2`:
+
+- 對 10 in 標準寬度 slide:margin=1.0 → content_w=8.0(測試 ≥ 8.0 通過)
+- 加 floor:`if margin < 0.5: margin = 0.5`(小 slide 保護)
+- 與 `_safe_shape.safe_textbox` fallback 邏輯一致
+
+### 修改清單
+
+8 個檔案,18 處:
+- `basic_info.py`(1 處)、`summary.py`(3)、`root_cause.py`(2)
+- `analysis_method.py`(3)、`evidence_checklist.py`(3)
+- `problem_definition.py`(3)、`prevention.py`(3)
+
+### 驗證
+
+- 本機 + 模擬 CI:233 passed, 3 skipped
+- ruff check + format:All passed
+- GitHub Actions Run #25:5/5 jobs success
+
+### 視覺驗收
+
+3 份報告改善後 pptx → 53 張 PNG(15+18+20),全部對齊:
+
+- ✅ 標題「分析方法與流程」從 left=1.20 in 開始
+- ✅ D1-D8 checkbox 從 left=1.00 in 開始
+- ✅ D1-D8 文字從 left=1.35 in 開始
+- 三者完全對齊(視覺上看不出「標題偏左」)
+
+驗收頁:`docs/handoff/screenshots/v3.1.4-regression-visual-review.html`
+
+### 給未來 Agent 的建議
+
+1. **不要只信單元測試**:v3.1.4 修正前單元測試全綠,但視覺仍錯。**一定要跑改善 + 截圖驗證**
+2. **別只看 Kenny 提到的單檔**:本次 Kenny 只說「標題偏左」,但 grep 整個系統發現 8 檔案都有問題
+3. **rebase 衝突 markers 殘留風險**:reset --hard 後必須 `git diff` 確認無衝突 markers,再 force-push
+
+---
+
+**詳細記錄**:`docs/handoff/2026-09-04-v3.1.4-regression-fix-handoff.md`
