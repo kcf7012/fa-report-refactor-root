@@ -42,6 +42,7 @@ Kenny 確認後才會從 P0 開始執行。
 
 1. 刪掉 Linux venv：`rm -rf .agents/skills/fa-report-improvement/.venv`
 2. 同時清掉搬遷殘留：`.ruff_cache/0.1.9/`、`.pytest_cache/`、`.coverage`、`dist/fa_improver-3.1.0*`、`scripts/improve_fa_report.py.bak`、根目錄 `.playwright-cli/`、`.agents/skills/playwright-cli/` 底下 11 個 WSL `*:Zone.Identifier`
+   > ⚠️ **不要動 skill repo 的 `stash@{0}`** —— 那是 P4 的證據，見下方「WSL 帶過來的 stash」
 3. `uv python install 3.10`（`.python-version` = 3.10；系統 `python3` 是 3.9.6，不能用）
 4. `uv sync --extra dev --extra llm` 重建
 5. **重裝 git hook**：`cd .agents/skills/fa-report-improvement && uv run pre-commit install`
@@ -104,6 +105,32 @@ Kenny 確認專案是從 WSL **整個目錄拷貝**過來的，所以 `.git/` �
 | 兩者 | repo-local `user.email = kenny.kang@elan.com.tw`（**Kenny 確認這是 Pi Agent 當時設錯的位址**）蓋掉 Mac 的 global `kenny7012@gmail.com` | 兩個 repo 共 **59 個 commit** 在 GitHub 上未連結任何帳號 | 只改未來，不動歷史 —— 見下方「commit 署名」 |
 
 **其餘都乾淨**：remote URL 正確、`core.filemode = true`（macOS 正確值）、無 `core.hooksPath`、無 LFS filter、無 credential 覆寫。root repo 的 `main` upstream 追蹤正常。
+
+#### WSL 帶過來的 stash（skill repo，**不要刪**）
+
+`git stash list` 有 1 筆從 WSL 帶過來的：
+
+```
+stash@{0}  2026-09-03 22:20:18 +0800
+WIP on v3.1.4-regression-fix: 5cb68a4 chore(pre-commit): 升級 ruff-pre-commit v0.1.9 → v0.16.5
+```
+
+內容是 7 個 improver 檔案、18 處 margin 修改 —— 也就是**回歸修正的第一版嘗試**。
+
+**不能套用**：`TITLE_SAFE_LEFT_INCH` 在 `analysis_method.py:54` 被使用，但 import 只寫在 `:128` 的另一個函式內部（函式內 import 不產生模組層級名稱）→ 呼叫時會 `NameError`。目前 main 上的版本已把 import 移到模組層級 `:25` 修好。`import TITLE_SAFE_LEFT_INCH,  get_or_create_title` 的雙空格顯示這是批次取代的產物。
+
+**但有佐證價值，與 P4 直接相關**：
+
+| | margin 表達式 | 實際值 | 與裝飾區的緩衝 |
+|---|---|---|---|
+| stash（第一版嘗試） | `TITLE_SAFE_LEFT_INCH` | **1.2** | 0.23 in |
+| 實際上線（`eb9afe3`+`5db2b5a`） | `TITLE_SAFE_LEFT_INCH - 0.2` | **1.0** | 0.03 in |
+
+稽核報告第 7 節指「上一輪 `TITLE_SAFE_LEFT_INCH - 0.2` 這個數字是為了讓既有測試通過而反推出來的」。這筆 stash 的存在與該說法一致：**最初採用的是與常數對齊的 1.2，之後才退成 1.0**。
+
+→ P4 做「安全距離量測」時要把這件事納入考量：1.2 是原本的意圖，1.0 是後來的妥協。量測結果若支持 1.2，就該改回去，而不是繼續遷就測試門檻。
+
+---
 
 #### commit 署名：只修未來，不改歷史
 
@@ -206,6 +233,18 @@ def resolve_report_file(name) -> Path | None
 
 **修完的直接效果**：這台 Mac 上 `report/` 明明有真實客戶 pptx（`260811_Kobo_*.pptx`、`MS_Meishan_*.pptx` + 對應 `fa_report_*.json/.txt`），現在 16 個視覺回歸測試卻全部靜默 fallback 去跑合成 fixture，**真實客戶檔的覆蓋等於整個消失**。修完就回來了。
 
+> **P1 是在補完第一輪稽核那個做了一半的修正**（`docs/handoff/2026-09-02-fa-report-refactor-audit-handoff.md` 發現 #2）：
+>
+> | 時間 | 狀態 |
+> |---|---|
+> | 第一輪（09-02） | 抓到 16 個測試寫死 `PROJECT_ROOT = Path("/home/elan/fa-report-refactor")` |
+> | 修法 | 改用 `_fixture_resolver.py` —— **但把 `/home/elan/...` 原封不動搬進去當 `_DEFAULT_ROOTS` 第一順位** |
+> | 第二、三輪稽核 | 柔伊從乾淨 clone 稽核，兩個候選路徑都不存在 → fallback 合成 fixture → 測試有跑 → **看起來是修好的** |
+> | Pi Agent 的 WSL | `/home/elan/...` 存在 → 跑真實客戶檔 → 也正常 |
+> | **這台 Mac** | 真實客戶檔在 `/Users/kennykang/...`，resolver 不認得 → **靜默降級** |
+>
+> 修正把「硬編路徑」從測試檔**搬家**到 resolver，沒有真正消除。而且失效方式從「19 skipped」（看得見）變成「測試照跑照過、只是資料變弱」（看不見）—— 比原本更難察覺。三輪稽核都沒抓到，是因為沒有任何一輪跑在「真實客戶檔存在、但路徑不同」的機器上。這正是本次遷移才暴露出來的。
+
 ### P1 附帶的小修
 
 | 檔案:行                                                     | 問題                                                                                                                                                                 | 修法                                                                          |
@@ -296,7 +335,7 @@ def resolve_report_file(name) -> Path | None
 
 **修法（順序不能顛倒）**：
 
-1. **先量測，再定值。** 稽核明確警告「不要為了讓既有測試通過而反推數值」（上一輪 `TITLE_SAFE_LEFT_INCH - 0.2` = 1.0 就是這樣選出來的，緩衝只剩 0.03 in）。先寫一次性腳本，從 `report/` 的三份真實客戶 pptx 量出母片左上裝飾的實際 x 範圍，把結果寫進 `_safe_shape.py` 常數區的 docstring。再據此決定 `TITLE_SAFE_LEFT_INCH`（目前 1.2）與 body margin（目前 1.0，17 處引用 `TITLE_SAFE_LEFT_INCH - 0.2`）該不該調。
+1. **先量測，再定值。** 稽核明確警告「不要為了讓既有測試通過而反推數值」（P0 附帶那筆 WSL stash 佐證了 1.2→1.0 的退讓過程，量測時一併參考）（上一輪 `TITLE_SAFE_LEFT_INCH - 0.2` = 1.0 就是這樣選出來的，緩衝只剩 0.03 in）。先寫一次性腳本，從 `report/` 的三份真實客戶 pptx 量出母片左上裝飾的實際 x 範圍，把結果寫進 `_safe_shape.py` 常數區的 docstring。再據此決定 `TITLE_SAFE_LEFT_INCH`（目前 1.2）與 body margin（目前 1.0，17 處引用 `TITLE_SAFE_LEFT_INCH - 0.2`）該不該調。
 
 2. **加 `_effective_left(ph)` helper。** 關鍵細節：slide 上的 placeholder 常常 `left is None`（幾何繼承自 layout），必須往 layout（再往 master）用相同 `idx` 找回實際座標，否則檢查會全部誤判為安全。
 
@@ -309,6 +348,30 @@ def resolve_report_file(name) -> Path | None
    > 現有 fixture 已經是好素材：`scripts/build_synthetic_fixtures.py:167-179` 在母片放了 `left=0, top=0, w=1.0in, h=0.5in` 的裝飾矩形，實測 4 張新投影片的 title 全部落在 `left=0.5, top=0.30`，幾何上確實重疊。問題只在程式碼與測試都沒走到這條路。
 
 5. **驗證修好了**：修改前先跑一次新測試確認它**紅**（能重現漏洞），修完再跑確認轉綠。這是稽核第 7 節「不要只看新加的測試通過就認為安全機制生效」的直接對策。
+
+### P4 附帶：順手收掉第一輪稽核的兩個 backlog
+
+這兩項就躺在 P4 要重構的同一個函式裡（來源：`2026-09-02-fa-report-refactor-audit-handoff.md` §「未來 release 待辦」，被降級為 backlog 後三輪都沒動）。
+
+**(a) `get_title_placeholder()` 的死碼（第一輪 backlog #1）** —— `_safe_shape.py:168-170` 實測仍在：
+
+```python
+    if len(list(slide.placeholders)) <= 1:
+        return None
+    return None          # ← 兩個分支結果完全相同
+```
+
+但**不只是死碼**：這段的原始意圖是「單一 placeholder 的 layout（如 Topic-Numbers）要跳過、改用 safe_textbox」，可是它被放在**策略 3 之後**。策略 3（`"title" in shape.name.lower()`）如果先命中那個唯一的 placeholder，就會直接 return 它，`<= 1` 的檢查根本輪不到執行 —— **意圖沒有被實作**。所以 P4 重構時要決定的是：刪掉它（承認意圖已由 fall-through 達成），還是把檢查移到策略 3 之前（真正實作原始意圖）。不要只是無腦刪掉一行了事。
+
+**(b) 直排偵測只認兩個字串（第一輪 backlog #2）** —— `_safe_shape.py:141` 與 `:192` 都是：
+
+```python
+    if "直排" in layout_name or "Vertical" in layout_name:
+```
+
+layout 名稱取決於**建立該 pptx 的 PowerPoint UI 語言**。zh-TW 是「直排」、en 是「Vertical」，但 zh-CN（「竖排」）、ja（「縦書き」）、以及「垂直」「縱向」「Portrait」等命名都會漏掉 → Bug 3（90° 旋轉）可能重現而測不出來。
+
+這一項與 **P7 的語系考量同源**（`test_visual_quality.py:43` 的 `RESIDUAL_TITLE_MARKERS = ("按一下", "Click to add", ...)` 是同一種脆弱比對，遇到 zh-CN/ja 母片會**假性通過**）。建議一併處理：擴充關鍵字清單，或改用更穩健的偵測（讀 layout placeholder 的 `orient` 屬性 / `bodyPr` 的 `vert`，而不是猜名稱）。
 
 ---
 
