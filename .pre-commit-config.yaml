@@ -1,0 +1,53 @@
+# 根倉庫的 pre-commit(v3.1.5 新增)
+#
+# 安裝(根倉庫在此之前從未裝過 hook,.git/hooks/ 只有 .sample):
+#     uvx pre-commit install
+#
+# 手動執行:
+#     uvx pre-commit run --all-files
+#
+# 這裡只放在根倉庫有意義的檢查 —— 程式碼在技能包倉庫,那邊有自己的
+# .pre-commit-config.yaml。兩個 repo 完全獨立,各自 commit、各自 hook。
+
+repos:
+  # 基本檔案檢查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # ⚠️ 這兩個 hook 會**改檔案**,所以排除兩類不該被動的內容:
+      #   report/      客戶資料與產出的 manifest —— 那是資料,不是原始碼
+      #   docs/handoff/ 歷史交接紀錄 —— 專案慣例是保留原樣
+      # (實測:不排除的話一次會改到 41 個檔,把真正的改動整個埋掉)
+      - id: trailing-whitespace
+        types_or: [markdown, yaml, json]
+        exclude: ^(report/|docs/handoff/)
+      - id: end-of-file-fixer
+        types_or: [markdown, yaml, json]
+        exclude: ^(report/|docs/handoff/)
+      # 以下都是唯讀驗證,對 report/ 一併套用是安全且有益的
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  - repo: local
+    hooks:
+      # 唯一能機制性擋住路徑回歸的東西。同一個問題已經犯過三次,
+      # 每次都是「修好了」之後再犯 —— 靠人記得沒有用。
+      - id: no-hardcoded-paths
+        name: 路徑守門(禁止新增絕對路徑字面值)
+        entry: python3 scripts/check_no_hardcoded_paths.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # handoff 文件彼此大量交叉引用,檔名長又含日期,打錯字連結就死掉,
+      # 而且 Markdown 不會報錯 —— 要有人真的去點才會發現。
+      - id: markdown-links
+        name: Markdown 連結檢查
+        entry: python3 scripts/check_markdown_links.py
+        language: system
+        pass_filenames: false
+        files: \.md$

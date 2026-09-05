@@ -1,0 +1,51 @@
+name: Checks
+
+# 根倉庫的最小 CI(v3.1.5 新增)。
+#
+# 在此之前根倉庫**完全沒有任何 CI** —— docs/ 與 report/ 的改動從來沒有被
+# 任何自動檢查看過。這裡只做兩件在根倉庫真正有意義的事:
+#   1. 路徑守門:擋掉新增的絕對路徑字面值(與技能包倉庫同一支腳本)
+#   2. Markdown 連結檢查:handoff 文件彼此大量交叉引用,檔名長又含日期,
+#      打錯一個字連結就死掉而且看起來完全正常
+#
+# 刻意不跑測試 —— 程式碼在技能包倉庫,那邊有完整的 CI。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Path & Link Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 路徑守門要比對 base commit,淺 clone 拿不到
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 路徑守門(禁止新增絕對路徑字面值)
+        # PR 時比對 base ref;push 到 main 時比對前一個 commit
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "無可比對的 base,改比對 HEAD~1"
+            BASE="HEAD~1"
+          fi
+          python3 scripts/check_no_hardcoded_paths.py --base "$BASE"
+
+      - name: Markdown 連結檢查
+        run: python3 scripts/check_markdown_links.py
