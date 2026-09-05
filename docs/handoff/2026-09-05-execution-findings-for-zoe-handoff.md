@@ -2,7 +2,8 @@
 
 > 撰寫者：Claude Code（Kenny 的 macOS 環境）
 > 日期：2026-09-05
-> 狀態：**發現 1 待柔伊複核；發現 2 根因已實證定案，只剩處置決定**
+> 狀態：**兩點皆已由柔伊第五輪查證複核完畢**（`2026-09-05-zoe-verification-p0p2-execution.md`）
+> 後續處置：見文末「柔伊複核後的結案」
 > 上游：`docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md`（P0-P7 計劃書）
 > 執行分支：技能包倉庫 `v3.1.5-cross-platform`（commit `7596ef2`、`e2168d5`、`cfdcac3`）
 
@@ -279,3 +280,69 @@ chflags -R nohidden /Users/kennykang/Desktop/VibeProj/Claude/fa-report-refactor
 
 **尚未 push 任何東西。** 技能包倉庫的 `main` 與 `origin/main` 同步，所有改動在
 `v3.1.5-cross-platform` 分支上。
+
+
+---
+
+## 柔伊複核後的結案（2026-09-05 15:40）
+
+柔伊的第五輪查證報告（`2026-09-05-zoe-verification-p0p2-execution.md`）逐條複核了本文件。
+以下是複核結論與已完成的處置。
+
+### 發現 1（覆蓋率）：判定「各對一半」，我接受
+
+我的技術歸因成立（她用受控實驗確認：同一份 origin/main、唯一變因是真實檔在不在位，
+85% → 89%）。但我把它框成「柔伊的結論反了」是錯的 —— 85% 與 90% 不是誰誤植，
+**是各講一個情境**，而上一輪站的是公開情境（badge、CI、任何從 clone 進來的人）。
+
+而且我交付的 90% 在當下就已過期：那只在 `e2168d5` 那一刻成立，下一個 commit
+`cfdcac3` 加了 LibreOffice 探測就掉回 89%。
+
+**已處置** —— 在 HEAD（`b2309d0`）重新實測兩種情境，文件一律兩個並列：
+
+| 情境 | 測試 | 覆蓋率 | 誰看得到 |
+| --- | --- | --- | --- |
+| CI / 乾淨 clone（只有合成 fixture） | 235 passed + **3 skipped** | **85%** | 全世界（badge 講的就是這個） |
+| 真實客戶檔在位 | 238 passed + **0 skipped** | **89%** | 只有 Kenny 這台機器 |
+
+CI 情境的數字是用 `git archive HEAD` 解到隔離目錄（確認 `find_project_root()` 回 `None`）
+再跑 `create_test_fixtures.py` 重現的，不是推估。
+
+同時修掉我自己造成的矛盾：`CLAUDE.md:94` 原本把降級後的值寫成基準、還說「skip 數增加
+代表路徑解析失效」（P1 之後這台機器 0 skipped 才是正常）；`AGENTS.md` 三處在 `860b938`
+已被我單方面改成 85%，卻在 `a6dfedb` 又寫「12 處的 90% 不動」。
+
+### 發現 2（iCloud）：根因確認，但我有一條證據引述不精確
+
+她複核確認了 iCloud 根因、`dataless` 旗標判準、以及 F1f（`.git/index 2` 已出現）。
+
+**F1d 我要更正**：本文件原本寫「`.coverage 2` 的 mtime 是 9/3 19:30，是被刪的 WSL 舊檔
+還原」。我當時 `ls -la` 的輸出確實顯示該 mtime，這點沒有記錯；但那三個檔案已在同一次
+清理中被我刪除，柔伊後來 `stat` 的是**重新產生的另一批**（birth 對應三次測試執行時間）。
+所以「被刪檔案復活」這個**詮釋**無法再驗證，較穩妥的說法是「iCloud 的衝突副本」——
+她指出的 `dataless` 旗標才是不會隨時間消失的判準。**根因結論不受影響。**
+
+### 三個紅燈的處置（皆已 commit）
+
+| # | 問題 | 處置 |
+| --- | --- | --- |
+| 1 | `python -m fa_improver` 壞掉，而 commit message 宣稱已實測 | 新增 `tests/unit/test_package_import.py`：用子行程 + `-E` 測「套件有沒有真的裝好」而非「conftest 有沒有幫忙插路徑」。照「修改前必須紅」驗證過（hidden 時 2 failed 並印出處置，清除後 2 passed）。**不在套件內加規避程式碼** —— 那是環境問題 |
+| 2 | `.gitignore` 的 `".coverage "*` 帶引號而失效 | 改為 `.coverage *`，並用 `git check-ignore -q` 先驗後 commit。另用 `dataless` 旗標掃全專案確認覆蓋無漏 |
+| 3 | `.git/index 2` 已出現 | **先做離線備份**（`git bundle --all` 兩個 repo 到 `~/fa-report-refactor-backups/`，在 iCloud 範圍外，已 `git bundle verify` 確認完整歷史），再刪除衝突副本；刪除後 `git status` 與 `git fsck` 皆正常 |
+
+另處理兩個柔伊列為 🟠/🟡 的項目：`sample_eval_json` 會選到批次輸出檔（缺陷 5，實測
+1 failed → 8 passed）、7 處測試碼改用 `paths.SKILL_ROOT`（缺陷 6）、`.pre-commit-config.yaml`
+不再寫死測試數（缺陷 7）。
+
+### 流程批評：接受
+
+> 「宣稱『已實測通過』的事，實測當下是真的，之後沒有回頭複驗。」
+
+這條完全成立，四個例子都對得上。**此後的作法：宣稱完成前，把驗收指令在最後一個
+commit 之後再跑一遍**，並把當時的 HEAD SHA 一起記下來，讓數字有明確的對應版本。
+
+### 仍未處置：搬離 iCloud
+
+`.git/index 2` 證明 iCloud 已經在對 `.git/` 內部做版本分岔。備份已備妥，
+搬家的技術前提也已具備（P1 讓程式碼零修改），**但搬動專案目錄需要 Kenny 決定**。
+在那之前，`chflags -R nohidden` 只是與同步機制賽跑。
