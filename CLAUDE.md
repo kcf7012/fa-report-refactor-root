@@ -17,13 +17,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⚠️ 這個 repo 正在從 WSL 遷移到 macOS,尚未完成
 
-專案原本在 Windows WSL(`/home/elan/fa-report-refactor/`)開發,整個目錄被**複製**(不是 clone)到目前的 macOS 路徑。因此有幾件事現在是壞的:
+專案原本在 Windows WSL(`/home/elan/fa-report-refactor/`)開發,整個目錄被**複製**(不是 clone)到目前的 macOS 路徑。因此有幾件事現在是壞的: <!-- allow-abs-path -->
 
 | 現況 | 影響 |
 |---|---|
 | `.agents/skills/fa-report-improvement/.venv/` 是 Linux x86-64 ELF | `.venv/bin/python` 執行會 `exec format error`,連 `uv sync` 都被擋住 |
 | 技能包 `.git/hooks/pre-commit` 寫死 WSL 路徑 | **該 repo 任何 `git commit` 都會失敗**;需 `uv run pre-commit install` 重新產生 |
-| `tests/integration/_fixture_resolver.py` 硬編 `/home/elan/...` | 真實客戶 pptx 存在卻找不到 → 16 個視覺回歸測試**靜默降級**跑合成 fixture(不報錯、不 skip) |
+| `tests/integration/_fixture_resolver.py` 硬編 `/home/elan/...` <!-- allow-abs-path --> | 真實客戶 pptx 存在卻找不到 → 16 個視覺回歸測試**靜默降級**跑合成 fixture(不報錯、不 skip) |
 | 技能包 `.git/config` 的 `user.email` 是不存在的位址 | commit 署名錯誤 |
 | 技能包 `main` 沒有 upstream 追蹤 | `git pull` 會 fatal |
 
@@ -45,7 +45,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `AGENTS.md` 是 WSL 時期寫的,以下內容**目前是錯的**(計劃書 P5 會修):
 
-- 所有 `cd /home/elan/fa-report-refactor` 指令(`:50,53,268,280`)
+- 所有 `cd /home/elan/fa-report-refactor` 指令(`:50,53,268,280`) <!-- allow-abs-path -->
 - `:20` 宣稱 uv 0.12.7+(v3.1.5 起本機與 CI 都是 0.8.22)
 - `:23,95` 宣稱有 black(`.pre-commit-config.yaml` 已停用)
 - `:326` 的 `.venv/bin/python`(改用 `uv run`)
