@@ -14,22 +14,22 @@
 cd .agents/skills/fa-report-improvement
 
 # 全部測試(含覆蓋率)
-.venv/bin/python -m pytest tests/ -v --cov=fa_improver --cov-report=term-missing
+uv run pytest tests/ -v --cov=fa_improver --cov-report=term-missing
 
 # 僅單元測試(快速)
-.venv/bin/python -m pytest tests/unit/ -v
+uv run pytest tests/unit/ -v
 
 # 僅整合測試
-.venv/bin/python -m pytest tests/integration/ -v
+uv run pytest tests/integration/ -v
 
 # 跑特定測試
-.venv/bin/python -m pytest tests/unit/test_ppt_converter.py -v
+uv run pytest tests/unit/test_ppt_converter.py -v
 
 # 跑特定測試類別
-.venv/bin/python -m pytest tests/unit/test_visual_generators.py::TestChecklistGenerator -v
+uv run pytest tests/unit/test_visual_generators.py::TestChecklistGenerator -v
 ```
 
-> 💡 **uv 使用者**:可用 `uv run pytest tests/` 取代 `.venv/bin/python -m pytest tests/`
+> 💡 **uv 使用者**:可用 `uv run pytest tests/` 取代 `uv run pytest tests/`
 
 ---
 
@@ -209,23 +209,23 @@ def test_something():
 
 ### 1. 查看失敗訊息
 ```bash
-../venv/bin/python -m pytest tests/unit/test_xxx.py -v --tb=long
+uv run pytest tests/unit/test_xxx.py -v --tb=long
 ```
 
 ### 2. 進入 pdb 除錯
 ```bash
-../venv/bin/python -m pytest tests/unit/test_xxx.py --pdb
+uv run pytest tests/unit/test_xxx.py --pdb
 ```
 
 ### 3. 只跑失敗的測試
 ```bash
-../venv/bin/python -m pytest --lf  # last failed
-../venv/bin/python -m pytest --ff  # failed first
+uv run pytest --lf  # last failed
+uv run pytest --ff  # failed first
 ```
 
 ### 4. 詳細模式
 ```bash
-../venv/bin/python -m pytest tests/ -vv --tb=long --capture=no
+uv run pytest tests/ -vv --tb=long --capture=no
 ```
 
 ---
@@ -234,12 +234,12 @@ def test_something():
 
 ### 平行執行(未來)
 ```bash
-../venv/bin/python -m pytest tests/ -n auto  # 需要 pytest-xdist
+uv run pytest tests/ -n auto  # 需要 pytest-xdist
 ```
 
 ### 快速煙霧測試
 ```bash
-../venv/bin/python -m pytest tests/ -x --tb=line -q
+uv run pytest tests/ -x --tb=line -q
 ```
 
 ---
