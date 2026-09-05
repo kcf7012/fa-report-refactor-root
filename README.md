@@ -3,9 +3,14 @@
 > 半導體 **F**ailure **A**nalysis(FA)報告的智慧化改善工具集
 
 [![Version](https://img.shields.io/badge/version-v3.1.4-blue)]()
-[![Tests](https://img.shields.io/badge/tests-233%20passed-success)]()
-[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-235%20passed%20(CI)-success)]()
+[![Coverage](https://img.shields.io/badge/coverage-85%25%20(CI)-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
+
+> 測試數與覆蓋率**取決於真實客戶 pptx 在不在位**(`report/` 被 .gitignore 排除、且屬機密不會進 CI):
+> **CI / 乾淨 clone 235 passed + 3 skipped / 85%**;**真實客戶檔在位 238 passed + 0 skipped / 89%**。
+> 只寫一個數字必定在另一個情境變成錯的 —— 這正是過去四輪稽核反覆爭論同一組數字的原因。
+
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
 
 ---
@@ -71,7 +76,7 @@ fa-report-refactor/
     │   ├── SKILL.md                    ← 技能包入口
     │   ├── CHANGELOG.md                ← 版本紀錄
     │   ├── src/fa_improver/            ← 主程式碼
-    │   ├── tests/                      ← 219 個測試
+    │   ├── tests/                      ← 測試(數量見上方說明)
     │   └── scripts/                    ← CLI 工具
     │
     ├── handoff-doc-generator/          ← 交接文檔產生器
