@@ -217,7 +217,7 @@ python improve_fa_report.py report.pptx \
     --api-key $OPENAI_API_KEY \
     --model gpt-4o-mini
 ```
-**優點**:簡單、低耦合  
+**優點**:簡單、低耦合
 **缺點**:每次都要付 API 費用;LLM 結果無法快取
 
 #### 方案 B:兩階段(評估快取)
@@ -228,7 +228,7 @@ python fa_evaluate.py report.pptx --output eval.json
 # 階段 2:改善(沿用現有 JSON 流程)
 python fa_improve.py report.pptx eval.json --output improved.pptx
 ```
-**優點**:分離關注點、評估結果可審核、可離線改善  
+**優點**:分離關注點、評估結果可審核、可離線改善
 **缺點**:多一步驟
 
 #### 方案 C:一鍵 + 評估快取(推薦)
@@ -238,7 +238,7 @@ python fa_improve.py report.pptx \
     --cache-eval ./evals/  \
     --output improved.pptx
 ```
-**優點**:兼顧便利性與可審核性  
+**優點**:兼顧便利性與可審核性
 **缺點**:實作稍複雜
 
 ### 3.4 LLM Client 抽象層設計

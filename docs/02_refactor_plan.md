@@ -67,7 +67,7 @@ class MasterTemplate:
     layouts: List[LayoutSnapshot]
     images: Dict[str, bytes]
     fonts: List[str]
-    
+
     def verify_unchanged(self, prs: Presentation) -> None:
         """驗證母片從改善開始到結束都未被修改"""
         ...
@@ -410,9 +410,9 @@ def test_master_not_modified_during_improvement():
     """確認改善前後母片 XML 完全一致"""
     original = load_test_fixture("sample_report.pptx")
     original_master_xml = original.slide_masters[0].element.xml
-    
+
     improved = improve_report(original, eval_data)
-    
+
     assert improved.slide_masters[0].element.xml == original_master_xml
     assert len(improved.slide_masters) == len(original.slide_masters)
     assert len(improved.slide_layouts) == len(original.slide_layouts)
@@ -421,10 +421,10 @@ def test_no_new_layouts_added():
     """確認改善未新增任何 layout"""
     original = load_test_fixture("sample_report.pptx")
     improved = improve_report(original, eval_data)
-    
+
     original_layout_names = {l.name for l in original.slide_layouts}
     improved_layout_names = {l.name for l in improved.slide_layouts}
-    
+
     assert improved_layout_names == original_layout_names
 ```
 
@@ -448,10 +448,10 @@ def test_openai_client_with_mock_response(monkeypatch):
     """使用預錄 response 測試 OpenAI client"""
     mock_response = load_fixture("openai_eval_response.json")
     monkeypatch.setattr(openai, "chat", lambda *_: mock_response)
-    
+
     client = OpenAIClient(api_key="test")
     result = client.evaluate_report(pptx_content="...", rubric="...")
-    
+
     assert isinstance(result, EvaluationResult)
     assert result.total_score > 0
 ```

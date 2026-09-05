@@ -39,26 +39,26 @@ Agent:
 ```python
 class FAReportAgent:
     """具備推理 + 行動能力的 Agent"""
-    
+
     def __init__(self, llm_client, tools: List[Tool]):
         self.llm = llm_client
         self.tools = {t.name: t for t in tools}
         self.memory = ConversationMemory()
         self.max_iterations = 10
-    
+
     def improve(self, report_path: str, goal: str) -> AgentResult:
         """主迴圈:Reason → Act → Observe"""
-        
+
         observation = self._initial_observation(report_path)
         self.memory.add("user", goal)
-        
+
         for i in range(self.max_iterations):
             # === Reason ===
             thought = self.llm.think(
                 context=self.memory.get_context(),
                 tools=list(self.tools.values()),
             )
-            
+
             # === Act ===
             if thought.needs_tool:
                 tool_result = self.tools[thought.tool_name].run(
@@ -69,11 +69,11 @@ class FAReportAgent:
             else:
                 # Agent 決定結束
                 return self._finalize(thought.final_answer)
-            
+
             # === Observe ===
             if self._is_goal_achieved():
                 return self._finalize(observation)
-        
+
         return AgentResult(status="max_iterations_reached")
 ```
 
@@ -103,10 +103,10 @@ class ParsePPTXTool(BaseModel):
     """解析 pptx 檔案,提取所有文字、表格、圖片資訊"""
     name: str = "parse_pptx"
     description: str = "讀取 pptx 檔案並回傳結構化內容"
-    
+
     class Arguments(BaseModel):
         file_path: str = Field(..., description="pptx 檔案路徑")
-    
+
     def run(self, file_path: str) -> dict:
         prs = Presentation(file_path)
         return {
@@ -129,16 +129,16 @@ class DetectFailureTypeTool(BaseModel):
     """根據報告內容識別失效類型"""
     name: str = "detect_failure_type"
     description: str = "從報告文字推測失效類型(ESD/EOS/THERMAL/...)"
-    
+
     class Arguments(BaseModel):
         report_text: str = Field(..., description="報告文字內容")
-    
+
     def run(self, report_text: str) -> dict:
         prompt = f"""根據以下 FA 報告內容,判斷最可能的失效類型。
         只回傳 JSON: {{"failure_type": "ESD|EOS|THERMAL|MECHANICAL|PROCESS|MATERIAL|DESIGN|UNKNOWN", "confidence": 0.0-1.0, "reasoning": "..."}}
-        
+
         報告:{report_text[:2000]}"""
-        
+
         return self.llm.complete_json(prompt)
 ```
 

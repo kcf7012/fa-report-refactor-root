@@ -22,7 +22,7 @@
 ### v3.0:智慧化推論
 
 ```
-輸入(.pptx) 
+輸入(.pptx)
   → LLM 深度理解(報告內容 + 失效類型 + 缺失維度)
   → 智慧決策引擎(決定加幾張、加什麼內容、用什麼視覺)
   → 樣板系統(提供視覺規範,不提供死板內容)
@@ -44,19 +44,19 @@
 @dataclass
 class ReportContext:
     """報告的完整上下文,所有改善決策的基礎"""
-    
+
     # 1. 失效類型分類
     failure_type: FailureType  # ESD / MECHANICAL / PROCESS / THERMAL / ...
-    
+
     # 2. 報告成熟度
     maturity: ReportMaturity  # DRAFT / PRELIMINARY / FORMAL / FINAL
-    
+
     # 3. 受眾
     audience: Audience  # INTERNAL_QA / CUSTOMER / SUPPLIER / REGULATORY
-    
+
     # 4. 缺失嚴重度(每個維度獨立評估)
     gaps: Dict[Dimension, GapSeverity]  # NONE / MINOR / MODERATE / SEVERE
-    
+
     # 5. 現有素材豐富度
     assets: AssetInventory  # 有多少圖表、表格、照片可用
 
@@ -85,12 +85,12 @@ class GapSeverity(Enum):
 def decide_improvements(context: ReportContext) -> ImprovementPlan:
     """根據報告上下文決定改善計畫"""
     plan = ImprovementPlan()
-    
+
     # === 基本資訊 ===
     if context.gaps[Dimension.BASIC_INFO] >= GapSeverity.MODERATE:
         # 嚴重缺失 → 新增 1 張完整的基本資訊投影片
         plan.add(SlideAction.ADD_BASIC_INFO, priority="高")
-    
+
     # === 根因分析 ===
     rc_severity = context.gaps[Dimension.ROOT_CAUSE]
     if rc_severity == GapSeverity.SEVERE:
@@ -106,7 +106,7 @@ def decide_improvements(context: ReportContext) -> ImprovementPlan:
     elif rc_severity == GapSeverity.MINOR:
         # 輕微缺失 → 1 張補充
         plan.add(SlideAction.ADD_RCA_SUPPLEMENT)
-    
+
     # === 失效類型專屬樣板 ===
     if context.failure_type == FailureType.ESD_DAMAGE:
         plan.add(SlideAction.ADD_ESD_SPECIFIC_GUIDANCE)
@@ -114,13 +114,13 @@ def decide_improvements(context: ReportContext) -> ImprovementPlan:
     elif context.failure_type == FailureType.THERMAL:
         plan.add(SlideAction.ADD_THERMAL_ANALYSIS_TEMPLATE)
         # 自動加入:熱阻分析、散熱設計建議
-    
+
     # === 受眾調整 ===
     if context.audience == Audience.CUSTOMER:
         plan.apply_tone(FormalTone.PROFESSIONAL)
     elif context.audience == Audience.INTERNAL_QA:
         plan.apply_tone(FormalTone.TECHNICAL_DETAILED)
-    
+
     return plan
 ```
 
@@ -145,11 +145,11 @@ v2.3.0 輸出:
 ```python
 def structure_llm_feedback(raw_feedback: str, failure_type: FailureType) -> StructuredAction:
     """將 LLM 自然語言評語轉為結構化行動項"""
-    
+
     # 1. 拆解為多個子任務
     actions = extract_action_items(raw_feedback)
     # → ["使用 5-Why 分析", "提供物理證據", ...]
-    
+
     # 2. 標註每個行動的屬性
     structured = []
     for action in actions:
@@ -160,7 +160,7 @@ def structure_llm_feedback(raw_feedback: str, failure_type: FailureType) -> Stru
             owner=infer_owner(action),          # FAE/QRA/IQC/PM
             verification=infer_verification(action),  # 如何驗證完成
         ))
-    
+
     # 3. 根據失效類型補充專業建議
     if failure_type == FailureType.ESD_DAMAGE:
         structured.append(ActionItem(
@@ -170,7 +170,7 @@ def structure_llm_feedback(raw_feedback: str, failure_type: FailureType) -> Stru
             owner="設計工程師",
             verification="HBM 測試通過 ±2kV",
         ))
-    
+
     return structured
 ```
 
@@ -179,7 +179,7 @@ def structure_llm_feedback(raw_feedback: str, failure_type: FailureType) -> Stru
 ```python
 class ContentEnricher:
     """把簡短的 LLM 建議擴展為具體可執行的內容"""
-    
+
     def enrich_iqc_action(self, brief: str) -> DetailedIQCStandard:
         """「建立 IQC SOP」→ 完整的 IQC 標準"""
         return DetailedIQCStandard(
@@ -193,7 +193,7 @@ class ContentEnricher:
             responsible_unit="IQC 工程師 + FAE",
             sop_document_id="ELAN-QA-IQC-XXX",
         )
-    
+
     def enrich_monitoring_action(self, brief: str) -> MonitoringStandard:
         """「自動化監測」→ 完整的監測計畫"""
         return MonitoringStandard(
@@ -215,32 +215,32 @@ class ContentEnricher:
 ```python
 def choose_visualization(content_type: ContentType, data: Any) -> VisualizationType:
     """根據內容類型自動選擇最適合的視覺元素"""
-    
+
     match content_type:
         case ContentType.PRIORITY_LIST:
             # 優先級清單 → 時間軸圖
             return VisualizationType.TIMELINE
-        
+
         case ContentType.COMPARISON:
             # 對照組 → 並排表格
             return VisualizationType.COMPARISON_TABLE
-        
+
         case ContentType.PROCESS_FLOW:
             # 流程(如 5-Why) → 流程圖
             return VisualizationType.FLOW_DIAGRAM
-        
+
         case ContentType.CHECKLIST:
             # 行動清單 → checkbox 列表
             return VisualizationType.CHECKLIST
-        
+
         case ContentType.SCORES:
             # 評分 → 進度條/雷達圖
             return VisualizationType.PROGRESS_BARS
-        
+
         case ContentType.ACTION_PLAN:
             # 行動計畫 → 時間軸 + checklist 組合
             return VisualizationType.TIMELINE_WITH_CHECKLIST
-        
+
         case _:
             return VisualizationType.BULLET_LIST
 ```
@@ -254,18 +254,18 @@ class SlideTemplate:
     name: str
     title: str
     layout_name: str  # 使用既有 layout 名稱
-    
+
     # 內容結構
     sections: List[Section]
-    
+
     # 版面規範
     max_words_per_section: int = 30
     max_bullets_per_section: int = 5
-    
+
     # 視覺元素
     primary_visual: Optional[VisualizationType] = None
     color_theme: str = "primary"
-    
+
     # 品質約束
     min_white_space_ratio: float = 0.3  # 至少 30% 留白
     max_total_words: int = 200
@@ -284,7 +284,7 @@ BUILTIN_TEMPLATES = {
         ],
         max_total_words=150,
     ),
-    
+
     "prevention_overview": SlideTemplate(
         name="prevention_overview",
         title="改善對策總覽",
@@ -312,7 +312,7 @@ BUILTIN_TEMPLATES = {
 ```python
 class QualityChecker:
     """改善完成後自動品質檢查"""
-    
+
     def check_all(self, original: Presentation, improved: Presentation) -> QualityReport:
         return QualityReport(
             master_preserved=self.check_master_preserved(original, improved),
@@ -322,7 +322,7 @@ class QualityChecker:
             visual_elements_present=self.check_visual_elements(improved),
             content_aligned_with_rubric=self.check_content_rubric_alignment(improved),
         )
-    
+
     def check_slide_density(self, prs: Presentation) -> bool:
         """檢查每張投影片的資訊密度,避免再次出現「擠在一起」"""
         for slide in prs.slides:
@@ -331,7 +331,7 @@ class QualityChecker:
             if word_count > 200:
                 return False  # 太多文字,應該拆分
         return True
-    
+
     def check_visual_elements(self, prs: Presentation) -> bool:
         """確認關鍵投影片有視覺元素(不只是純文字)"""
         for slide in prs.slides:
@@ -351,10 +351,10 @@ class QualityChecker:
 ```python
 class MasterProtector:
     """三層保護機制,確保母片絕不被破壞"""
-    
+
     def __init__(self, prs: Presentation):
         self.snapshot = self._capture_immutable_state(prs)
-    
+
     def _capture_immutable_state(self, prs: Presentation) -> MasterSnapshot:
         """擷取所有不可變的狀態"""
         return MasterSnapshot(
@@ -364,7 +364,7 @@ class MasterProtector:
             layout_names=[l.name for l in prs.slide_layouts],
             background_xml=self._extract_background_xml(prs),
         )
-    
+
     def verify_after_improvement(self, prs: Presentation) -> None:
         """改善後驗證母片未被修改"""
         new_snapshot = self._capture_immutable_state(prs)

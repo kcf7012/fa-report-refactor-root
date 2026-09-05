@@ -113,14 +113,14 @@ def expand_section_to_slides(
     insert_after_idx: int,
 ) -> List[Slide]:
     """通用展開模式:把一段內容展開為多張投影片"""
-    
+
     patterns = {
         SectionType.SUMMARY: expand_summary_pattern,
         SectionType.PREVENTION: expand_prevention_pattern,
         SectionType.ROOT_CAUSE: expand_root_cause_pattern,
         SectionType.BASIC_INFO: expand_basic_info_pattern,
     }
-    
+
     pattern_fn = patterns[section_type]
     return pattern_fn(prs, context, insert_after_idx)
 
@@ -129,13 +129,13 @@ def expand_summary_pattern(prs, context, after_idx):
     """模式 A:Summary 展開為 3 張"""
     s1 = add_summary_report_slide(prs, context)  # 原 Summary
     move_to(prs, len(prs.slides) - 1, after_idx + 1)
-    
+
     s2 = add_executive_summary_slide(prs, context)  # LLM 評估
     move_to(prs, len(prs.slides) - 1, after_idx + 2)
-    
+
     s3 = add_key_improvements_slide(prs, context)  # 改進建議
     move_to(prs, len(prs.slides) - 1, after_idx + 3)
-    
+
     return [s1, s2, s3]
 ```
 

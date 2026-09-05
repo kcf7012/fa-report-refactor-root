@@ -97,10 +97,10 @@ class DimensionScore:
     score: float                    # 0-100
     weight: float                   # 0-1
     notes: str = ""
-    
+
     @property
     def severity(self) -> GapSeverity: ...
-    
+
     @property
     def gap(self) -> float: ...      # 100 - score
 ```
@@ -115,7 +115,7 @@ class EvaluationResult:
     dimensions: list[DimensionScore]
     summary: str = ""
     improvements: list[Improvement] = field(default_factory=list)
-    
+
     def gap(self, dim: Dimension) -> float: ...
     def severity(self, dim: Dimension) -> GapSeverity: ...
     def needs_improvement(self, dim: Dimension) -> bool: ...
@@ -160,7 +160,7 @@ class SlideTemplate:
     sections: list[TemplateSection]
     color_theme: ColorTheme = ColorTheme.PRIMARY
     max_bullets_per_section: int = 4
-    
+
     def validate(self) -> None:
         """驗證樣板規範,違反則拋 TemplateValidationError"""
 ```
@@ -197,7 +197,7 @@ class FilenameParser:
         """從檔名提取 FA 編號、客戶、產品資訊"""
 ```
 
-範例:`Kobo_ZHT_RA6080_SPcomFailI.pptx` → 
+範例:`Kobo_ZHT_RA6080_SPcomFailI.pptx` →
 ```
 {
   "customer": "Kobo",
@@ -220,13 +220,13 @@ class FilenameParser:
 ```python
 class MasterProtector:
     def __init__(self, prs: Presentation): ...
-    
+
     def snapshot(self) -> MasterSnapshot:
         """擷取改善前的母片狀態"""
-    
+
     def assert_unchanged(self, original: MasterSnapshot) -> None:
         """改善後驗證母片未變(失敗則拋 MasterProtectionError)"""
-    
+
     def assert_can_add_slide(self, layout_name: str) -> None:
         """確認 layout 已存在(不可新增 layout)"""
 ```
@@ -255,7 +255,7 @@ def find_content_layout(prs: Presentation, prefer_title: bool = True) -> SlideLa
 class BaseImprover(ABC):
     @abstractmethod
     def is_applicable(self, evaluation: EvaluationResult) -> bool: ...
-    
+
     @abstractmethod
     def improve(self, prs: Presentation, evaluation: EvaluationResult) -> int:
         """回傳新增的投影片數量"""
@@ -281,7 +281,7 @@ class BaseImprover(ABC):
 ```python
 class ImprovementOrchestrator:
     def __init__(self, improvers: list[BaseImprover] | None = None): ...
-    
+
     def plan(self, evaluation: EvaluationResult) -> list[SlideAction]: ...
     def execute(self, prs: Presentation, evaluation: EvaluationResult) -> int: ...
 ```
@@ -314,10 +314,10 @@ class ImprovementOrchestrator:
 ```python
 class TemplateLoader:
     def __init__(self, template_dir: Path | None = None): ...
-    
+
     def load(self, name: str) -> SlideTemplate: ...
     def list_available(self) -> list[str]: ...
-    
+
     # 內建樣板捷徑
     def load_builtin(self, name: str) -> SlideTemplate: ...
 ```
@@ -442,7 +442,7 @@ print(f"總分: {result.total_score}, 等級: {result.grade}")
 class PPTConverter:
     def convert_if_needed(self, file_path: Path) -> Path | None:
         """若輸入是 .ppt,自動轉為 .pptx"""
-    
+
     def cleanup(self) -> None:
         """清理轉換過程中的臨時檔"""
 ```
