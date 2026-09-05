@@ -44,10 +44,12 @@ repos:
         always_run: true
 
       # handoff 文件彼此大量交叉引用,檔名長又含日期,打錯字連結就死掉,
-      # 而且 Markdown 不會報錯 —— 要有人真的去點才會發現。
+      # 而且 Markdown/HTML 都不會主動報錯 —— 要有人真的去點才會發現。
+      # v3.1.5(柔伊第七輪查證 B2 延伸):原本只查 .md,驗收頁 index.html
+      # 那類死連結抓不到 —— 已擴充支援 .html 的 <img src> / <a href>。
       - id: markdown-links
-        name: Markdown 連結檢查
+        name: Markdown / HTML 連結檢查
         entry: python3 scripts/check_markdown_links.py
         language: system
         pass_filenames: false
-        files: \.md$
+        files: \.(md|html)$
