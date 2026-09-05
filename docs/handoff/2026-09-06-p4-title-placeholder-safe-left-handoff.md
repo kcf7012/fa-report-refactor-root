@@ -17,7 +17,7 @@
 
 ## 基準線與變動
 
-| 項目 | P4 之前(`ea0c7fb`) | P4 之後(`08e412a`) |
+| 項目 | P4 之前(`ea0c7fb`) | P4 之後(`6259cd8`) |
 |---|---|---|
 | pytest | 239 passed / 0 skipped | **242 passed / 0 skipped** |
 | 覆蓋率 | 89% | **89%** |
@@ -29,11 +29,11 @@
 會 skip,屆時是 **241 passed + 1 skipped**。
 
 > ⚠️ README badge 的數字這一輪仍**未動**(依第七輪報告第 3 項)。P4 已定案,
-> 要對齊的話用上表的 242 / 89% @ `08e412a`。
+> 要對齊的話用上表的 242 / 89% @ `6259cd8`。
 
 ---
 
-## commit(4 個,順序本身就是證據)
+## commit(6 個,前 4 個的順序本身就是「先量測後定值」的證據)
 
 ```
 cecd70a feat(scripts): 加母片裝飾量測腳本,結果寫進 _safe_shape 常數區   ← 只量測,不改值
@@ -44,7 +44,7 @@ ec24213 fix(improvers): 內容右留白與左安全邊界解耦(修 CI 回歸)  
 6259cd8 fix(paths): docstring 移除絕對路徑字面值(修路徑守門)        ← 開 PR 後才發現
 ```
 
-實際 diff 的 10 個檔案(`git diff --name-only cecd70a^..HEAD`)已與待辦清單逐項對照過:
+實際 diff 的 11 個檔案(`git diff --name-only cecd70a^..HEAD`)已與待辦清單逐項對照過:
 
 ```
 scripts/measure_master_decoration.py
