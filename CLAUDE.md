@@ -46,7 +46,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 `AGENTS.md` 是 WSL 時期寫的,以下內容**目前是錯的**(計劃書 P5 會修):
 
 - 所有 `cd /home/elan/fa-report-refactor` 指令(`:50,53,268,280`)
-- `:20` 宣稱 uv 0.12.7+;`:22` 宣稱覆蓋率 90%(實測 85%,且 `:258` 自己寫 85%)
+- `:20` 宣稱 uv 0.12.7+(v3.1.5 起本機與 CI 都是 0.8.22)
 - `:23,95` 宣稱有 black(`.pre-commit-config.yaml` 已停用)
 - `:326` 的 `.venv/bin/python`(改用 `uv run`)
 
@@ -91,7 +91,15 @@ uv run python -m fa_improver <input.pptx> --eval <eval.json> --output <out.pptx>
 
 `pyproject.toml` 的 `addopts` 已內建 `--cov=fa_improver --cov-report=term-missing`,所以任何 pytest 呼叫都會跑覆蓋率;沒裝 dev extra 時 `pytest` 會因無法識別參數而直接失敗。
 
-基準數字:**233 passed, 3 skipped, 覆蓋率 85%**(文件多處誤植 90%)。**skip 數增加代表路徑解析失效**,不是正常現象。
+基準數字**取決於真實客戶 pptx 在不在位**,只寫一個數字必定在另一個情境變成錯的:
+
+| 情境 | 測試 | 覆蓋率 |
+|---|---|---|
+| CI / 乾淨 clone(只有合成 fixture) | 235 passed + **3 skipped** | **85%** |
+| 真實客戶檔在位(根倉庫 `report/`) | 238 passed + **0 skipped** | **89%** |
+
+**這台機器上正常值是 0 skipped**;出現 3 skipped 代表路徑解析失效、真實客戶檔沒被讀到
+(v3.1.5 前的舊值 233/3/85% 就是這種降級狀態)。CI 上 3 skipped 才是正常的。
 
 ---
 

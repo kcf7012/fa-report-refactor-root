@@ -22,7 +22,7 @@
 | **主語言** | Python ≥ 3.10 |
 | **套件管理** | uv(取代 pip + venv)。版本以 `.github/workflows/test.yml` 的 `UV_VERSION` 為準,本機用 `uv --version` 確認 |
 | **測試框架** | pytest + pytest-cov |
-| **測試結果** | **233 passed + 3 skipped,覆蓋率 85%**(多處舊文件誤植 90%,以實跑為準) |
+| **測試結果** | **CI / 乾淨 clone:235 passed + 3 skipped,覆蓋率 85%**;**真實客戶檔在位時:238 passed + 0 skipped,覆蓋率 89%**。詳見 `docs/handoff/2026-09-05-zoe-verification-p0p2-execution.md` 第 4 節 |
 | **Lint** | ruff(check + format)。black 已停用,見 `.pre-commit-config.yaml` 註解 |
 | **主入口** | `.agents/skills/fa-report-improvement/src/fa_improver/cli.py` |
 
@@ -97,7 +97,7 @@ fa-report-refactor/
 │   │   ├── .pre-commit-config.yaml     ← Git hooks(ruff / ruff-format / 基本檢查 / pytest)
 │   │   ├── requirements.txt            ← pip fallback(向後相容)
 │   │   ├── src/fa_improver/            ← 主程式碼(39 個 .py)
-│   │   ├── tests/                      ← 233 passed + 3 skipped
+│   │   ├── tests/                      ← 238 passed(CI:235 + 3 skipped)
 │   │   ├── references/                 ← 領域知識(5 份)
 │   │   └── scripts/                    ← 向後相容 CLI 入口
 │   │
@@ -272,7 +272,7 @@ ignore = ["E501"]  # line-too-long(交給 black)
 - 方法:`test_<scenario>_<expected>`(snake_case)
 - AAA 模式:Arrange / Act / Assert
 - 母片保護測試必寫
-- 覆蓋率目標:**≥ 80%**(目前 85%)
+- 覆蓋率目標:**≥ 80%**(目前:CI 85% / 真實客戶檔在位 89%)
 
 ---
 
@@ -393,7 +393,7 @@ v3.1.0 起,OpenAI client 自動處理瞬時錯誤:
 | 🟢 P2 | `--api-key` CLI 參數 | `b5fbfba` | ✅ 完成 |
 | 🟢 P2 | `test_template_validation.py` | `9a39076` | ✅ 完成 |
 
-**成果**:測試 102 → 203(+101),tag `v3.1.0` 已建立。(當時 handoff 宣稱覆蓋率達 90%,但獨立稽核與 CI log 實測都是 85%,此處不再沿用該數字。)
+**成果**:測試 102 → 203(+101),tag `v3.1.0` 已建立。(當時 handoff 宣稱覆蓋率達 90%。後續查明:90% 是「真實客戶檔在位」情境的值,85% 是 CI/乾淨 clone 情境的值,兩者都不是誤植,只是各講一個情境 —— 此後一律兩個並列。)
 
 下一輪任務參考 `docs/handoff/` 最新交接文檔。
 
