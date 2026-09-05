@@ -125,7 +125,7 @@ git push origin main  # 兩個倉庫各自獨立 push
 | v3.0.1 | 2026-08-30 | pre-commit + uv.lock + ppt_converter 測試 |
 | v3.0.0 | 2026-08-30 | 模組化架構 + 6 維度完整覆蓋 + LLM 整合 |
 
-完整紀錄:見 [.agents/skills/fa-report-improvement/CHANGELOG.md](.agents/skills/fa-report-improvement/CHANGELOG.md)
+完整紀錄:見技能包倉庫的 [CHANGELOG.md](https://github.com/kcf7012/fa-report-refactor/blob/main/CHANGELOG.md)
 
 ---
 
@@ -133,10 +133,16 @@ git push origin main  # 兩個倉庫各自獨立 push
 
 | 技能包 | 用途 |
 |--------|------|
-| ⭐ [fa-report-improvement](.agents/skills/fa-report-improvement/SKILL.md) | FA 報告智慧化改善 |
-| [handoff-doc-generator](.agents/skills/handoff-doc-generator/SKILL.md) | 任務交接文檔產生器 |
-| [commit-helper](.agents/skills/commit-helper/SKILL.md) | Conventional commit 訊息產生器 |
-| [code-reviewer](.agents/skills/code-reviewer/SKILL.md) | 自動化程式碼審查 |
+| ⭐ [fa-report-improvement](https://github.com/kcf7012/fa-report-refactor/blob/main/SKILL.md) | FA 報告智慧化改善(獨立倉庫) |
+| `handoff-doc-generator` | 任務交接文檔產生器(僅本機) |
+| `commit-helper` | Conventional commit 訊息產生器(僅本機) |
+| `code-reviewer` | 自動化程式碼審查(僅本機) |
+
+> 根 `.gitignore` 排除 `.agents/`,所以**根倉庫不追蹤技能包的任何檔案**。
+> 指向 `.agents/...` 的相對連結只在本機(技能包實體存在時)有效,對任何
+> clone 根倉庫的人都是死連結 —— 所以技能包的檔案一律用 GitHub URL 連結,
+> 只存在於本機的 skill 則寫成純文字。`scripts/check_markdown_links.py` 會擋。
+
 
 ---
 
@@ -145,7 +151,7 @@ git push origin main  # 兩個倉庫各自獨立 push
 開始工作前請讀:
 1. **[AGENTS.md](AGENTS.md)** — 必讀(AI agent 工作規則)
 2. **[docs/00_executive_summary.md](docs/00_executive_summary.md)** — 重點摘要
-3. **[.agents/skills/fa-report-improvement/SKILL.md](.agents/skills/fa-report-improvement/SKILL.md)** — 主技能包入口
+3. **[技能包的 SKILL.md](https://github.com/kcf7012/fa-report-refactor/blob/main/SKILL.md)** — 主技能包入口(在獨立倉庫)
 
 ---
 
