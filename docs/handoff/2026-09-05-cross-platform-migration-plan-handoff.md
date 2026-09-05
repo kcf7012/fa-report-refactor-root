@@ -576,6 +576,39 @@ layout 名稱取決於**建立該 pptx 的 PowerPoint UI 語言**。zh-TW 是「
 4. **執行 P0 前，兩個 repo 各自重新跑一次 `git config --local user.email` 確認現況，不要假設兩個都還是錯的。** 查證當下發現 **root repo（`fa-report-refactor-root`）的 local email 已經是對的**（`73571535+kcf7012@users.noreply.github.com`，檔案 mtime 2026-09-05 05:17，早於這輪查證）——可能是先前哪個步驟已經順手改掉了。目前只確認 **skill repo** 還是錯的（`kenny.kang@elan.com.tw`），root repo 那條指令直接跑會是 no-op，不用擔心跑錯，但心裡要有數這不是「兩邊都還沒動」的乾淨起點。
 5. **補一句 P0-P6 的相依關係，避免誤判整條路都被 GitHub 帳號問題卡住**：P0 的環境重建/hook 修復、P1 路徑 resolver、P2 工具鏈對齊、P4 標題缺口修正、P5 文件更新，這幾項**只需要本機 `git commit`，不需要 push 權限，帳號問題解決前就可以正常推進**。只有 **P3 第 5 步（branch protection，需要 admin）跟整個 P6（tag push / release / secret）** 卡在帳號問題上。不要因為看到 P0 那段帳號警告就以為整個計劃要等帳號解決才能開始。
 
+
+### 查證回應（本 session，2026-09-05）
+
+> 上面五點保留柔伊原文未修改。以下是逐條獨立查證的結果與處置；**正文相關段落均已依此更新**，所以若上面的敘述與正文數字不一致，以本表為準。
+
+| # | 柔伊的說法 | 查證結果 | 處置 |
+|---|---|---|---|
+| 1 | `_effective_left()` 不用手刻 | ✅ **正確，且比原述更完整** | P4 第 2 步已改寫 |
+| 2 | 「59 個 commit」數字錯，實測 102 | ✅ **正確，原數字是本 session 的錯誤** | 正文四處已更正為 102 |
+| 3a | CI job 名稱是 `:56` 非 `:57` | ✅ 正確 | P3 第 1 步已更正 |
+| 3b | Zone.Identifier 實測 10 個非 11 個 | ✅ 正確 | P0 第 2 步已更正 |
+| 3c | `analysis_method.py` 是 `:56` 非 `:54` | ❌ **誤判** | 原文補上版本標註 |
+| 4 | root repo email 查證當下已是正確值 | ⚠️ **事實正確，歸因有誤** | 見下方說明 |
+| 5 | 補 P0-P6 相依關係 | ✅ **正確且有價值** | 予以保留 |
+
+**第 1 點的完整結論**（比原述更強）：讀 `pptx/shapes/placeholder.py` 確認繼承鏈走到底——
+
+```
+SlidePlaceholder → _BaseSlidePlaceholder(_InheritsDimensions, Shape)
+    ._base_placeholder → layout placeholder（依 idx 比對）
+LayoutPlaceholder(_InheritsDimensions, Shape)
+    ._base_placeholder → master placeholder（依 placeholder 型別對應）
+```
+
+`_effective_value()` 的邏輯是「本層有設就用本層，否則往上一層取」，`left`/`top`/`width`/`height` 四個屬性都套用。所以 `ph.left` 讀到的已經是**解析到母片**的有效值。唯一要保留的是 `None` 判斷——layout 與 master 都沒有對應 placeholder 時 `_inherited_value()` 仍回 `None`。
+
+**第 2 點更正的數字**：root 47 + skill 55 = **102**（main 分支），含所有分支 47 + 57 = **104**。原「59」是「每個 repo 抽樣最近 30 個 commit」得到的 29 + 30，被誤寫成總數，是本 session 的表述錯誤。
+
+**第 3c 為何是誤判**：原文那句描述的是 **stash 版本**的 `analysis_method.py`，實測 stash 版該行確為 `:54`；現況 main 是 `:56`。兩個數字在各自脈絡下都正確。但原文未標明版本，容易誤讀，已在該處補上「stash 版」與現況行號對照。
+
+**第 4 點的歸因更正**：root repo 的 local email 並非「先前哪個步驟已經順手改掉了」，而是**本 session 在 commit `fe2a5f7` 之前明確修改的**——當時已向 Kenny 說明理由（不改就會產生第 103 個錯誤署名的 commit）並附上退回指令。柔伊的 sub-agent 只能看到檔案 mtime，看不到對話脈絡，因此推測為不明變更。
+**但她的行動建議仍然成立**：執行 P0 前兩個 repo 各自跑一次 `git config --local user.email` 確認現況，不要假設兩邊都還是錯的。目前 **root repo 已正確、skill repo 仍是錯的**。
+
 ---
 
 ## 風險
