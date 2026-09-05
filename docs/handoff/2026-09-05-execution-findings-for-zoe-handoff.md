@@ -1,18 +1,22 @@
-# Handoff：P0-P1 執行中的兩個發現 — 請柔伊複核
+# Handoff：P0-P1 執行中的兩個發現
 
 > 撰寫者：Claude Code（Kenny 的 macOS 環境）
 > 日期：2026-09-05
-> 狀態：**兩點都已實測，但都需要獨立複核**
+> 狀態：**發現 1 待柔伊複核；發現 2 根因已實證定案，只剩處置決定**
 > 上游：`docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md`（P0-P7 計劃書）
 > 執行分支：技能包倉庫 `v3.1.5-cross-platform`（commit `7596ef2`、`e2168d5`、`cfdcac3`）
 
 ## 這份文件的定位
 
 計劃書 P0、P1 已執行完畢。過程中撞到兩件**計劃書沒預料到、且會影響後續判斷**的事。
-第 1 點會讓 P5 照著做就做錯方向；第 2 點是環境層面的隱形故障，Claude Code 排查到一個
-段落但無法定案，需要在 Kenny 的機器上繼續查。
 
-兩點的原始證據都寫在下面，包含「已經排除了什麼」，避免重複勞動。
+| # | 內容 | 狀態 |
+| --- | --- | --- |
+| 1 | 覆蓋率的 90% 是對的，85% 才是錯的 | **待柔伊複核** —— 照計劃書 P5 做會改錯方向 |
+| 2 | 專案在 iCloud Drive 同步範圍內，弄壞 venv | **根因已定案**，不需再排查；只剩 Kenny 決定要不要搬專案 |
+
+發現 2 原本只查到「某個背景程式在設 `UF_HIDDEN`」，後續已實證定案為 iCloud Drive
+的「桌面與文件」同步。排查過程與已排除的假設一併保留在下面，供日後遇到類似症狀時參考。
 
 ---
 
@@ -141,15 +145,90 @@ a1_coverage.pth                  st_flags=0x8040  UF_HIDDEN=True
 「散落、無規律、隨時間增長」這個型態指向**背景常駐程式在逐檔掃描並設旗標**，
 最可能是公司資安 EDR、防毒、或備份／同步用戶端。
 
-### 請 Kenny / 柔伊接著查的方向
+### ✅ 根因已定案：iCloud Drive 的「桌面與文件」同步（2026-09-05 14:47 查出）
 
-1. `ls -lO` 看旗標出現的時間分布，對照 `fs_usage` 或 `sudo fs_usage -w -f filesys | grep chflags`
-   找出是哪個 process 在呼叫 `chflags`。
-2. 檢查有無公司派送的 MDM / EDR 代理（`ps aux`、`launchctl list`、`/Library/LaunchDaemons/`）。
-3. 確認是否只影響 `~/Desktop/VibeProj/` 底下，還是全機。（目前只在專案樹觀察到，
-   `~/.cache/uv/` 是乾淨的，所以**不是全機無差別**。）
+**專案位於 iCloud Drive 的同步範圍內。**`~/Desktop` 已被 macOS 的
+「Desktop & Documents Folders」功能納入 iCloud，實際內容在
+`~/Library/Mobile Documents/com~apple~CloudDocs/Desktop/`：
 
-### 應急處理
+```
+$ ls -d "/Users/kennykang/Library/Mobile Documents/com~apple~CloudDocs/Desktop/VibeProj/Claude/fa-report-refactor"
+→ 存在。專案在 iCloud 同步範圍內。
+
+$ brctl status
+... server:full-sync|fetched-recents sync:has-synced-down last-sync:2026-09-05 14:45:45 ...
+→ 正在主動同步（查詢當下數秒前才同步過）
+```
+
+**決定性證據 —— 被刪掉的檔案以「衝突副本」形式回來了**：
+
+| 檔案 | mtime | 說明 |
+| --- | --- | --- |
+| `.coverage 2` | **9月3日 19:30** | 這正是 P0 清理時刪掉的那個 WSL 舊檔，原封不動被還原，只是加了 ` 2` 後綴 |
+| `.ruff_cache/0.16.5 2` | — | 同上，P0 刪掉的 ruff cache |
+| `.ruff_cache/.gitignore 2` | — | 同上 |
+
+`名稱 + 空格 + 數字` 是 iCloud Drive 標準的衝突副本命名。**本機刪除 → 雲端還原**
+完整解釋了「清成 0 之後十幾分鐘又長回幾千個」的現象：那些檔案不是被重新標記，
+而是**被從雲端重新下載**，連同它們的 `UF_HIDDEN` 旗標一起。
+
+### ⚠️ 這比原本以為的嚴重：iCloud 同步一個 git repo + venv 是有實質風險的
+
+| 風險 | 後果 |
+| --- | --- |
+| 刪除會被還原 | 任何 `rm`（清 cache、清 venv、`git clean`）都可能被復原成 ` 2` 副本 |
+| `UF_HIDDEN` 讓 `.pth` 失效 | editable install 靜默失效（本文件記錄的原始症狀） |
+| **`.git/` 物件被同步** | 兩個 git repo 的 `.git/` 都在同步範圍內。iCloud 沒有交易保證，**可能還原出前後不一致的 object / index / ref，造成 repo 損毀**。這是目前最大的風險 |
+| dataless / 已卸載檔案 | iCloud 可能把不常用檔案「移到雲端」只留佔位符，讀取時觸發下載；build 或測試中途會出現非預期的 I/O 停頓或失敗 |
+| venv 檔案量 | 一個 venv 有 6600+ 檔案且經常整批重建，等於持續對 iCloud 灌流量 |
+
+### 建議處置（需 Kenny 決定）
+
+**首選：把專案搬出 `~/Desktop`**，例如 `~/Projects/fa-report-refactor` 或 `~/dev/`。
+家目錄下非 Desktop/Documents 的路徑不在 iCloud 同步範圍。搬完之後：
+
+```bash
+# 1. 搬移
+mkdir -p ~/Projects && mv ~/Desktop/VibeProj/Claude/fa-report-refactor ~/Projects/
+
+# 2. 清掉殘留的旗標與衝突副本
+chflags -R nohidden ~/Projects/fa-report-refactor
+find ~/Projects/fa-report-refactor -name "* [0-9]" -not -path "*/.venv/*"   # 先看再刪
+
+# 3. venv 內含絕對路徑，換位置後必須重建
+cd ~/Projects/fa-report-refactor/.agents/skills/fa-report-improvement
+rm -rf .venv && uv sync --locked --extra dev --extra llm
+uv run pre-commit install     # hook 內也寫死絕對路徑，要重新產生
+
+# 4. 驗證兩個 repo 完好
+git -C ~/Projects/fa-report-refactor fsck
+git -C ~/Projects/fa-report-refactor/.agents/skills/fa-report-improvement fsck
+```
+
+> ⚠️ 這會讓本文件與計劃書裡所有 `/Users/kennykang/Desktop/...` 的引述過時。
+> 但因為 P1 已經把程式碼內的路徑全部改成動態解析，**程式碼不需要任何修改** ——
+> 這正好是這輪重構的直接回報。
+
+**次選（若不想搬）**：在「系統設定 → Apple 帳戶 → iCloud → 雲碟 → 桌面與文件夾」關閉同步。
+但這會影響整個 Desktop 的既有行為，範圍比搬專案大。
+
+**不建議**：靠 `.nosync` 後綴或定期跑 `chflags`。前者要改目錄名，後者是與同步機制賽跑，
+治標不治本，而且完全擋不住 `.git/` 損毀的風險。
+
+### 目前兩個 repo 的健康狀態（2026-09-05 14:49 實測）
+
+```
+$ git fsck   # 兩個 repo
+→ 只有 dangling blob / tree（來自 stash、已刪的 v3.1.4-audit-fixes 分支、
+  以及把 main reset 回 origin/main 時留下的物件）—— 這是正常的。
+→ 沒有 missing object、沒有 broken link。
+$ find .git -name "* [0-9]"
+→ 無。.git/ 內目前沒有 iCloud 衝突副本。
+```
+
+**結論：損壞尚未發生。** 但風險是持續存在的，愈早搬離愈好。
+
+### 應急處理（在搬離之前）
 
 ```bash
 chflags -R nohidden /Users/kennykang/Desktop/VibeProj/Claude/fa-report-refactor
