@@ -2,7 +2,8 @@
 
 - 日期:2026-09-06
 - 技能包 branch:`v3.1.5-cross-platform`(已推遠端,**未合併 main**)
-- 驗收時 HEAD:`08e412add211dd4ebf9b1220a3da29ba70a968d0`(short `08e412a`)
+- 驗收時 HEAD:`6259cd8`(遠端 CI run 33982437333 **8 job 全綠**)
+- PR:https://github.com/kcf7012/fa-report-refactor/pull/2
 - 對應計劃書:`docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md` 第 334 行起
 
 ---
@@ -39,6 +40,8 @@ cecd70a feat(scripts): 加母片裝飾量測腳本,結果寫進 _safe_shape 常�
 306fd89 fix(safe_shape): 原生 title placeholder 也要過安全左界檢查
 971d428 refactor(improvers): body margin 改用 BODY_SAFE_LEFT_INCH(19 處)
 08e412a test(visual): placeholder 也要驗左界,加母片裝飾幾何重疊測試
+ec24213 fix(improvers): 內容右留白與左安全邊界解耦(修 CI 回歸)      ← 開 PR 後才發現
+6259cd8 fix(paths): docstring 移除絕對路徑字面值(修路徑守門)        ← 開 PR 後才發現
 ```
 
 實際 diff 的 10 個檔案(`git diff --name-only cecd70a^..HEAD`)已與待辦清單逐項對照過:
@@ -48,6 +51,7 @@ scripts/measure_master_decoration.py
 src/fa_improver/improvers/_safe_shape.py
 src/fa_improver/improvers/{analysis_method,basic_info,evidence_checklist,
                             prevention,problem_definition,root_cause,summary}.py
+src/fa_improver/paths.py
 tests/integration/test_visual_quality.py
 ```
 
@@ -211,6 +215,54 @@ E    Slide 6: 'TextBox 18'   (1.00,5.50)-(9.00,7.00) 壓到母片裝飾 'Picture
 
 ---
 
+## ⚠️ 開 PR 之後才發現的兩件事(本輪最該記住的教訓)
+
+本機驗收全綠、推上去開 PR,CI **8 個 job 全紅**。兩個獨立原因,都不是本機跑得出來的。
+
+### (1) body margin 提高造成的內容寬度回歸 —— 本機測不出來
+
+`test_260811_standard_width_has_dynamic_shapes` 斷言最大 content 寬度 >= 8.0 in,
+CI 實測只有 **7.30**。
+
+**為什麼本機是綠的**:這支測試在 Kenny 的機器上解到**真實 260811**,那是直排
+layout,走 `get_or_create_body()` 的 `sw - margin - 0.5`;CI 沒有真實檔,解到
+**synthetic_A**,走 improver 的 `content_w = sw - 2 * margin`。**兩種 fixture
+來源走的是不同程式碼路徑** —— 這正是 `CLAUDE.md`「加測試時要確認你的測試在兩種
+來源下都有意義」警告的那個陷阱,而且它咬的是**既有**測試,不是新加的。
+
+**真正的原因不是 1.35 太大**,是 11 處 improver 把右留白綁在左安全邊界上:
+左邊界為了避開裝飾往右挪 0.35 in,寬度就被砍 0.70 in,右邊平白多空一塊
+(右緣停在 8.65,10 in 的投影片右邊空了 1.35 in)。右側沒有母片裝飾的限制,
+本來就不該跟著左邊界走。
+
+修法:獨立常數 `CONTENT_RIGHT_MARGIN_INCH = 0.5` —— 那是 `get_or_create_body()`
+一直在用的值,兩條路徑產出的寬度從此一致(修正前 body textbox 8.15、
+content box 8.00,本來就對不上)。結果 10 in 投影片的內容寬度 **8.00 → 8.15**,
+比修正前更寬,**不是把測試門檻改鬆**。
+
+### (2) 路徑守門在 PR 上才看得到完整範圍
+
+`Lint & Format` 掃到 `src/fa_improver/paths.py` docstring 裡 P1 加的 runner
+workspace 絕對路徑。之前 branch 上的 CI 都是 `workflow_dispatch` 觸發,
+`BASE` 退回 `HEAD~1`、**只掃最後一個 commit**;開 PR 後 `BASE` 是 merge base,
+掃的是整條 branch 的 diff。**不是新問題,是開 PR 才第一次讓守門看到完整範圍。**
+
+改寫敘述而非加 `allow-abs-path` 豁免:那行只是在說明「舊版硬編的是什麼」,
+留著字面值等於在守門規則上開一個沒必要的洞。
+
+### 給下一輪的具體防呆建議
+
+- **本機沒有「CI 模式」跑法**。`FA_REPORT_PROJECT_ROOT` 只能*增加*候選根目錄,
+  無法*排除*自動往上找到的真實根倉庫,所以沒辦法用環境變數把本機切成
+  「只有合成 fixture」。這是 P1 統一路徑解析後仍留下的缺口,建議補一個
+  「強制只用合成 fixture」的開關(例如 `FA_REPORT_FORCE_SYNTHETIC=1`)。
+  在那之前,動到版面常數時**一定要另外對三份合成 fixture 各跑一次**。
+- **推 branch 之前先讓守門掃完整範圍**:
+  `uv run python scripts/check_no_hardcoded_paths.py --base origin/main`
+  (pre-commit 只掃 staged diff,掃不到這個)。
+
+---
+
 ## P4 附帶的兩個 backlog
 
 ### (a) 死碼 —— 已處理:**刪掉**
@@ -272,9 +324,9 @@ zh-CN「竖排」與 ja「縦書き」會漏掉,並寫明「不要靠加關鍵�
 
 ## 給下一位接手者
 
-1. **合併 P4**:技能包 `enforce_admins=true`,必須開 PR。branch 已推到
-   `v3.1.5-cross-platform`,CI 綠了才能合。
-2. **README badge / 版本號對齊**:P4 已定案,數字是 **242 passed / 89% @ `08e412a`**
+1. **合併 P4**:PR #2 已開,CI run 33982437333 **8 job 全綠**(Build Distribution
+   skipped)。技能包 `enforce_admins=true`,必須走 PR。
+2. **README badge / 版本號對齊**:P4 已定案,數字是 **242 passed / 89% @ `6259cd8`**
    (CI 上 241 passed + 1 skipped)。計劃書 P6 那批四個 README 一起做。
 3. **P5 之前先看** `2026-09-05-execution-findings-for-zoe-handoff.md` 發現 1
    ——計劃書 P5 的覆蓋率結論(85%)已被實測推翻。
