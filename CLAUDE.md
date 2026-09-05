@@ -29,6 +29,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **完整的遷移與修正計劃在 `docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md`(P0-P7)。動手前先讀它**,不要自己重新發明修法。
 
+### 目前進度(2026-09-05)
+
+| 項目 | 狀態 |
+|---|---|
+| 計劃書 | 已完成並經獨立複查,**Kenny 審閱中,尚未授權執行** |
+| P0-P7 | **全部尚未開始**,程式碼一行未改 |
+| 根倉庫 | 有數個 commit 在本地 `main`,**未 push** |
+| 技能包倉庫 | 完全未動,HEAD 與 `origin/main` 同步 |
+
+> 接手時先跑 `git log --oneline origin/main..HEAD` 與 `git status` 確認實際狀態,不要以本表為準——這行字會過時。
+> **未經 Kenny 明確指示不要開始執行 P0,也不要 push。**
+
 ### AGENTS.md 有已知錯誤,不要照抄
 
 `AGENTS.md` 是 WSL 時期寫的,以下內容**目前是錯的**(計劃書 P5 會修):
