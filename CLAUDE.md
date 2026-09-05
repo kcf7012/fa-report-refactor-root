@@ -69,6 +69,43 @@ fa-report-refactor/                              ← 根倉庫 (kcf7012/fa-repor
 
 ---
 
+## ⚠️ 這個專案在 iCloud Drive 同步範圍內,會定期弄壞 venv
+
+`~/Desktop` 已被 macOS 的「桌面與文件」功能納入 iCloud(實體在
+`~/Library/Mobile Documents/com~apple~CloudDocs/Desktop/`)。後果:
+
+| 症狀 | 機制 |
+|---|---|
+| `uv run python -m fa_improver` 突然 `ModuleNotFoundError` | venv 的 `.pth` 被設上 `UF_HIDDEN`,Python 的 `site.addpackage()` 會**直接跳過** hidden 的 `.pth`,editable install 因此不在 `sys.path` 上 |
+| **`git commit` 被自己的 pre-commit hook 擋下** | 上述狀態下 `tests/unit/test_package_import.py` 必紅,而 pytest hook 是 `always_run` |
+| 刪掉的檔案帶著原始 mtime 自己回來(`.coverage 2`) | iCloud 的衝突副本 / 雲端還原 |
+
+**實測復發速度:清乾淨後約 10 分鐘就會長回幾千個 hidden 檔。**
+
+### commit 前撞到 pytest 紅在 `test_package_import` 時
+
+```bash
+chflags -R nohidden .        # 在專案根目錄執行,然後重試 commit
+```
+
+這是**正常的**,不是程式壞掉 —— 那支測試就是設計來讓這個故障可見的
+(在此之前它是隱形的:測試全綠但 CLI 壞掉)。
+
+### 建議的根治(擇一,都需要 Kenny 決定)
+
+1. **把 venv 移出 iCloud**(15 分鐘,程式碼零修改):
+   `export UV_PROJECT_ENVIRONMENT="$HOME/.venvs/fa-report-improvement"` 寫進 `~/.zshrc`,
+   之後 `uv sync` 會把 venv 建在外部,專案目錄下不再產生 `.venv`。
+   一次解決 CLI 失效與 commit 被擋,並少掉近半的 hidden 檔。
+   **但治不了 `.git/` 仍在同步範圍內**這個最大風險。
+2. **把整個專案搬出 `~/Desktop`**(例如 `~/Projects/`)—— 真正的根治。
+   P1 已把程式碼路徑全部動態化,搬完**程式碼不用改**,只需重建 venv 與
+   `pre-commit install`(這兩者內含絕對路徑)。
+
+完整證據與排查過程:`docs/handoff/2026-09-05-execution-findings-for-zoe-handoff.md` 發現 2。
+
+---
+
 ## 常用指令
 
 全部在技能包目錄下執行,一律用 `uv run`(不要用 `.venv/bin/...`,那是 POSIX-only 且目前是壞的):
@@ -162,6 +199,11 @@ FA 報告含公司機密(Logo、機密等級標示、部門色系)。`layout/pro
 ## 慣例
 
 - **Conventional Commit + 中文訊息**:`<prefix>: <50 字內簡述>`,prefix 用 `feat/fix/docs/chore/refactor/test/style/perf/ci`。
+- **宣稱完成前,把驗收指令在最後一個 commit 之後再跑一遍。** 中途通過不算數 ——
+  環境類的驗收(能不能 import、指令跑不跑得動)會在幾分鐘內失效。報告數字時附上當時的 HEAD SHA。
+- **驗收要包含「我聲稱修改的檔案,是否真的都在 diff 裡」。** 用 `git show --name-only`
+  或 `git diff --name-only` 對照自己列的待辦清單。連續兩輪敗在同一個地方:**改了一部分
+  就宣告「一律」**(AGENTS.md 那次、README badge 那次)。
 - **Handoff 文檔**:`docs/handoff/<YYYY-MM-DD>-<task-slug>-handoff.md`。寫日期前用 `date` 確認今天,不要沿用文件裡的舊日期。
 - **版本號**:改版時 `pyproject.toml` + `src/fa_improver/__init__.py` + `SKILL.md` frontmatter 三處必須同步(四個 README 也常漏,見計劃書 P6)。
 - 型別提示用 Python 3.10+ 語法(`list[X]`、`X | None`)。
