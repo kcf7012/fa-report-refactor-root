@@ -41,7 +41,7 @@ Kenny 確認後才會從 P0 開始執行。
 ## P0 — 環境重建（阻斷性，必須最先做）
 
 1. 刪掉 Linux venv：`rm -rf .agents/skills/fa-report-improvement/.venv`
-2. 同時清掉搬遷殘留：`.ruff_cache/0.1.9/`、`.pytest_cache/`、`.coverage`、`dist/fa_improver-3.1.0*`、`scripts/improve_fa_report.py.bak`、根目錄 `.playwright-cli/`、`.agents/skills/playwright-cli/` 底下 11 個 WSL `*:Zone.Identifier`
+2. 同時清掉搬遷殘留：`.ruff_cache/0.1.9/`、`.pytest_cache/`、`.coverage`、`dist/fa_improver-3.1.0*`、`scripts/improve_fa_report.py.bak`、根目錄 `.playwright-cli/`、`.agents/skills/playwright-cli/` 底下 10 個 WSL `*:Zone.Identifier`
    > ⚠️ **不要動 skill repo 的 `stash@{0}`** —— 那是 P4 的證據，見下方「WSL 帶過來的 stash」
 3. `uv python install 3.10`（`.python-version` = 3.10；系統 `python3` 是 3.9.6，不能用）
 4. `uv sync --extra dev --extra llm` 重建
@@ -93,7 +93,7 @@ Kenny 確認後才會從 P0 開始執行。
 >
 > `kcf7012`（id 73571535）與 `KennyKang7012`（id 14908981，2015 建立）是**兩個不同的 GitHub 帳號**。在 GitHub「Add people」填 email，只有當該 email 是某帳號的「已驗證 email」時才會解析成帳號。
 >
-> **附帶**：兩個 repo 共 **59 個 commit** 的作者 `kenny.kang@elan.com.tw` 未連結任何 GitHub 帳號（灰頭像、不計入貢獻）。該位址**不存在**，無法驗證，所以回溯連結做不到 —— 詳見下方「commit 署名」。
+> **附帶**：兩個 repo 共 **102 個 commit**（root 47 + skill 55，main 分支；含所有分支 104）的作者 `kenny.kang@elan.com.tw` 未連結任何 GitHub 帳號（灰頭像、不計入貢獻）。該位址**不存在**，無法驗證，所以回溯連結做不到 —— 詳見下方「commit 署名」。
 
 ### P0 附帶：`.git/` 是整份複製，不是 clone
 
@@ -104,7 +104,7 @@ Kenny 確認專案是從 WSL **整個目錄拷貝**過來的，所以 `.git/` �
 | skill | `.git/hooks/pre-commit` 寫死 `/home/elan/...`                                                                                                   | **`git commit` 直接失敗**                                     | P0 第 5 步 `uv run pre-commit install`          |
 | skill | **`main` 沒有 upstream 追蹤** —— `[branch "main"]` 只剩 `vscode-merge-base = origin/main`（VS Code 殘骸），正式的 `remote` / `merge` 兩行不存在 | `git pull` 在 main 上 fatal；`git status` 不顯示 ahead/behind | `git branch --set-upstream-to=origin/main main` |
 | skill | 本地分支 `v3.1.4-audit-fixes` 追蹤的遠端分支**已刪除**（遠端只剩 `main` 與 `v3.1.4-regression-fix`）                                            | 孤兒分支                                                      | `git fetch --prune` 後刪除已合併的本地分支      |
-| 兩者  | repo-local `user.email = kenny.kang@elan.com.tw`（**Kenny 確認這是 Pi Agent 當時設錯的位址**）蓋掉 Mac 的 global `kenny7012@gmail.com`          | 兩個 repo 共 **59 個 commit** 在 GitHub 上未連結任何帳號      | 只改未來，不動歷史 —— 見下方「commit 署名」     |
+| 兩者  | repo-local `user.email = kenny.kang@elan.com.tw`（**Kenny 確認這是 Pi Agent 當時設錯的位址**）蓋掉 Mac 的 global `kenny7012@gmail.com`          | 兩個 repo 共 **102 個 commit** 在 GitHub 上未連結任何帳號      | 只改未來，不動歷史 —— 見下方「commit 署名」     |
 
 **其餘都乾淨**：remote URL 正確、`core.filemode = true`（macOS 正確值）、無 `core.hooksPath`、無 LFS filter、無 credential 覆寫。root repo 的 `main` upstream 追蹤正常。
 
@@ -119,7 +119,7 @@ WIP on v3.1.4-regression-fix: 5cb68a4 chore(pre-commit): 升級 ruff-pre-commit 
 
 內容是 7 個 improver 檔案、18 處 margin 修改 —— 也就是**回歸修正的第一版嘗試**。
 
-**不能套用**：`TITLE_SAFE_LEFT_INCH` 在 `analysis_method.py:54` 被使用，但 import 只寫在 `:128` 的另一個函式內部（函式內 import 不產生模組層級名稱）→ 呼叫時會 `NameError`。目前 main 上的版本已把 import 移到模組層級 `:25` 修好。`import TITLE_SAFE_LEFT_INCH,  get_or_create_title` 的雙空格顯示這是批次取代的產物。
+**不能套用**：`TITLE_SAFE_LEFT_INCH` 在 **stash 版**`analysis_method.py:54` 被使用（現況 main 該行是 `:56`），但 import 只寫在 stash 版 `:128` 的另一個函式內部（函式內 import 不產生模組層級名稱）→ 呼叫時會 `NameError`。目前 main 上的版本已把 import 移到模組層級 `:25` 修好。`import TITLE_SAFE_LEFT_INCH,  get_or_create_title` 的雙空格顯示這是批次取代的產物。
 
 **但有佐證價值，與 P4 直接相關**：
 
@@ -163,7 +163,7 @@ git config user.email "73571535+kcf7012@users.noreply.github.com"
 
 未來 commit 歸屬 `kcf7012`，並與帳號既有的隱私設定一致。
 
-**明確不做：改寫歷史**。曾評估「把設錯的 email 加進 GitHub verified emails 以回溯連結 59 個 commit」，但該位址無法驗證，此路不通。改用 `git filter-repo` 重寫作者的代價則完全不成比例：59 個 commit 全部換 SHA、兩個 repo 都要 force-push、已發布的 `v3.1.4` Release 指向的 `5cb68a4` 失效、稽核報告與各份 handoff 引用的 SHA（`f2118cf`／`b071b00`／`eb9afe3`／`5db2b5a`…）全變死引用。歷史 commit 顯示灰頭像、不計入貢獻圖，是**純外觀**問題。
+**明確不做：改寫歷史**。曾評估「把設錯的 email 加進 GitHub verified emails 以回溯連結 102 個 commit」，但該位址無法驗證，此路不通。改用 `git filter-repo` 重寫作者的代價則完全不成比例：102 個 commit 全部換 SHA、兩個 repo 都要 force-push、已發布的 `v3.1.4` Release 指向的 `5cb68a4` 失效、稽核報告與各份 handoff 引用的 SHA（`f2118cf`／`b071b00`／`eb9afe3`／`5db2b5a`…）全變死引用。歷史 commit 顯示灰頭像、不計入貢獻圖，是**純外觀**問題。
 
 > **已確認（Kenny 2026-09-05）**：`kenny.kang@elan.com.tw` 是**不存在的位址**（網域打錯，正確是 `emc.com.tw`），不是任何同事的信箱。因此沒有「公開他人公司信箱」的疑慮，**改寫歷史徹底排除**，此議題結案。
 
@@ -302,7 +302,7 @@ def resolve_report_file(name) -> Path | None
 
 `.github/workflows/test.yml` 是兩個 repo 裡唯一的 workflow（根倉庫**沒有任何 CI**）。
 
-1. **加 macOS runner**：`:62` `os: [ubuntu-latest]` → `[ubuntu-latest, macos-latest]`。job 名稱 `:57` 要改成 `Test (${{ matrix.os }} / Python ${{ matrix.python-version }})`，否則兩個 OS 的 job 名稱會撞在一起。Codecov/artifact 步驟 `:105,:114` 已經有 `matrix.os == 'ubuntu-latest'` 的 gate，不用動。
+1. **加 macOS runner**：`:62` `os: [ubuntu-latest]` → `[ubuntu-latest, macos-latest]`。job 名稱 `:56` 要改成 `Test (${{ matrix.os }} / Python ${{ matrix.python-version }})`，否則兩個 OS 的 job 名稱會撞在一起。Codecov/artifact 步驟 `:105,:114` 已經有 `matrix.os == 'ubuntu-latest'` 的 gate，不用動。
    > 這一步要排在 P1 之後 —— 硬編的 `/home/runner/work/...` 在 macOS runner 上是錯的，先修 resolver 才有意義。
 2. **新增 `pre-commit` job**：`uv run pre-commit run --all-files`。現在 pre-commit 完全沒在 CI 跑，CI 只手動重複了 ruff 那兩個 hook，`check-merge-conflict`／`check-yaml`／`detect-private-key` 這些從來沒有在 PR 上被執行過 —— 這正是「衝突標記沒清乾淨直接 push」能連續兩輪發生的原因。
 3. **新增路徑守門 hook**：local pre-commit hook + CI 步驟，只要新增行在 `docs/handoff/` 以外出現 `/home/elan` 或 `/Users/kennykang` 就失敗。這是唯一能機制性阻止路徑回歸的東西。
@@ -341,13 +341,24 @@ def resolve_report_file(name) -> Path | None
 
 1. **先量測，再定值。** 稽核明確警告「不要為了讓既有測試通過而反推數值」（P0 附帶那筆 WSL stash 佐證了 1.2→1.0 的退讓過程，量測時一併參考）（上一輪 `TITLE_SAFE_LEFT_INCH - 0.2` = 1.0 就是這樣選出來的，緩衝只剩 0.03 in）。先寫一次性腳本，從 `report/` 的三份真實客戶 pptx 量出母片左上裝飾的實際 x 範圍，把結果寫進 `_safe_shape.py` 常數區的 docstring。再據此決定 `TITLE_SAFE_LEFT_INCH`（目前 1.2）與 body margin（目前 1.0，17 處引用 `TITLE_SAFE_LEFT_INCH - 0.2`）該不該調。
 
-2. **加 `_effective_left(ph)` helper。** 關鍵細節：slide 上的 placeholder 常常 `left is None`（幾何繼承自 layout），必須往 layout（再往 master）用相同 `idx` 找回實際座標，否則檢查會全部誤判為安全。
+2. **直接讀 `ph.left`，不要手刻繼承解析。** 原本規劃寫一個 `_effective_left(ph)` helper 往 layout／master 追座標——**不需要**。查證 python-pptx 原始碼（`pptx/shapes/placeholder.py`）確認繼承鏈已內建且走到底：
+
+   ```
+   SlidePlaceholder → _BaseSlidePlaceholder(_InheritsDimensions, Shape)
+       ._base_placeholder → layout placeholder（依 idx 比對）
+   LayoutPlaceholder(_InheritsDimensions, Shape)
+       ._base_placeholder → master placeholder（依 placeholder 型別對應）
+   ```
+
+   `_InheritsDimensions._effective_value()` 的邏輯就是「本層有設就用本層，否則往上一層取」，`left`/`top`/`width`/`height` 四個屬性都套用。所以 **`ph.left` 讀到的已經是解析後的有效值**，省下一個函式與一份對應測試。
+
+   **唯一要保留的**：`ph.left` 仍可能是 `None`（layout 與 master 都沒有對應 placeholder 時，`_inherited_value()` 回 `None`），所以 `None` 判斷不能省。
 
 3. **在策略1／策略2 命中後加安全檢查。** 建議 **把原生 placeholder 往右移**（`ph.left = Inches(TITLE_SAFE_LEFT_INCH)`，同步縮 width 不讓它超出投影片），而不是 `return None` 走 safe_textbox —— 因為移動 placeholder 保留母片的字型/顏色樣式，符合本專案「母片保護是最高優先」的原則。只有在移動後寬度小於合理下限時才降級成 safe_textbox。
 
    > 這是寫入 **slide 層級**的 `<a:xfrm>`，不動 master/layout，`tests/unit/test_master_protection.py` 不會被破壞 —— 但這條要在 PR 裡明確驗證。
 
-4. **修測試。** 拿掉 `test_visual_quality.py:271-273` 的 `if shape.is_placeholder: continue`，改成對 placeholder 也用 `_effective_left()` 檢查。再加一個**直接指名** `synthetic_C_decoration.pptx` 的測試（不透過 `FIXTURE_FALLBACKS` 的 MS stem 對應），斷言每張新投影片的 title `left >= TITLE_SAFE_LEFT_INCH`。
+4. **修測試。** 拿掉 `test_visual_quality.py:271-273` 的 `if shape.is_placeholder: continue`，改成對 placeholder 也直接讀 `ph.left` 檢查（記得處理 `None`）。再加一個**直接指名** `synthetic_C_decoration.pptx` 的測試（不透過 `FIXTURE_FALLBACKS` 的 MS stem 對應），斷言每張新投影片的 title `left >= TITLE_SAFE_LEFT_INCH`。
 
    > 現有 fixture 已經是好素材：`scripts/build_synthetic_fixtures.py:167-179` 在母片放了 `left=0, top=0, w=1.0in, h=0.5in` 的裝飾矩形，實測 4 張新投影片的 title 全部落在 `left=0.5, top=0.30`，幾何上確實重疊。問題只在程式碼與測試都沒走到這條路。
 
