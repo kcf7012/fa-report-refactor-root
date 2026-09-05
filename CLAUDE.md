@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 語言
+
+- **回覆、commit message、handoff 文檔、程式碼註解一律使用台灣繁體中文。**
+- **技術術語保留英文原文,不要硬翻成中文**:placeholder、layout、fixture、commit、branch protection、coverage、lint、hook、stash、upstream、pipeline、fallback、resolver、mixin 等直接寫英文。
+- 用台灣慣用詞,避免中國大陸用語:**程式碼**(非「代碼」)、**檔案**(指 file 時,非「文件」)、資料夾、記憶體、預設值、函式、變數、字串。
+  > 既有文件(含 `AGENTS.md`)還有少數「代碼」等用詞未統一,新寫的內容請用台灣用法。
+
+---
+
 ## ⚠️ 這個 repo 正在從 WSL 遷移到 macOS,尚未完成
 
 專案原本在 Windows WSL(`/home/elan/fa-report-refactor/`)開發,整個目錄被**複製**(不是 clone)到目前的 macOS 路徑。因此有幾件事現在是壞的:

@@ -2,9 +2,12 @@
 
 > **給 AI coding agent(pi、Claude Code、GPT 等)在這個專案工作的規則**
 >
-> 本檔規範 agent 在 `/home/elan/fa-report-refactor/` 的行為、慣例、與可用工具。
+> 本檔規範 agent 在本專案的行為、慣例、與可用工具。專案根目錄以 `<PROJECT_ROOT>` 表示,實際位置依機器而定,不要寫死。
 >
-> ⚠️ **今天日期**:2026-09-03(請勿使用其他日期寫入文件,特別是 handoff 與 CHANGELOG)
+> ⚠️ **寫日期前先跑 `date "+%Y-%m-%d"` 確認今天**——不要沿用本檔或任何文件裡出現過的日期。
+> 舊版本曾在此硬編某一天的日期,導致後續 handoff 與 CHANGELOG 全部寫錯,已移除。
+>
+> 📌 **Claude Code 使用者請先讀 `<PROJECT_ROOT>/CLAUDE.md`**——該檔記錄目前這台機器的實際狀態(含遷移未完成造成的故障)與正確指令。
 
 ---
 
@@ -14,13 +17,13 @@
 |------|-----|
 | **名稱** | fa-report-refactor |
 | **用途** | 半導體 FA(Failure Analysis)報告智慧化改善工具 |
-| **當前版本** | **v3.1.4(2026-09-03)** |
+| **當前版本** | v3.1.4 tag,但 `main` HEAD 已超前 5 個 commit(回歸修正未進 tag);下一版規劃 v3.1.5 |
 | **Git 倉庫** | 雙倉庫架構(根倉庫 + 技能包子倉庫) |
 | **主語言** | Python ≥ 3.10 |
-| **套件管理** | uv 0.12.7+(取代 pip + venv) |
+| **套件管理** | uv(取代 pip + venv)。版本以 `.github/workflows/test.yml` 的 `UV_VERSION` 為準,本機用 `uv --version` 確認 |
 | **測試框架** | pytest + pytest-cov |
-| **測試結果** | **233 passed + 3 skipped,覆蓋率 90%** |
-| **Lint** | ruff + black(由 pre-commit 自動執行) |
+| **測試結果** | **233 passed + 3 skipped,覆蓋率 85%**(多處舊文件誤植 90%,以實跑為準) |
+| **Lint** | ruff(check + format)。black 已停用,見 `.pre-commit-config.yaml` 註解 |
 | **主入口** | `.agents/skills/fa-report-improvement/src/fa_improver/cli.py` |
 
 ---
@@ -30,7 +33,7 @@
 本專案使用**雙 git 倉庫**:
 
 ```
-/home/elan/fa-report-refactor/                        ← 根倉庫
+<PROJECT_ROOT>/                                       ← 根倉庫
 ├── .agents/skills/fa-report-improvement/.git/        ← 技能包子倉庫
 ├── docs/                                              ← 根倉庫追蹤
 ├── AGENTS.md (本檔)                                   ← 根倉庫追蹤
@@ -40,17 +43,17 @@
 
 | 倉庫 | 追蹤範圍 | 用途 |
 |------|---------|------|
-| **根倉庫**(`/home/elan/fa-report-refactor/`) | `docs/` + `report/` + `AGENTS.md` + 根 `README.md` | 文件、評估、設計 |
+| **根倉庫**(`<PROJECT_ROOT>/`) | `docs/` + `report/` + `AGENTS.md` + 根 `README.md` | 文件、評估、設計 |
 | **技能包倉庫**(`.agents/skills/fa-report-improvement/`) | `SKILL.md` + `src/` + `tests/` + `references/` | 程式碼、測試、樣板 |
 
 ### ⚠️ commit 時要小心
 
 ```bash
 # 在根倉庫工作(預設)
-cd /home/elan/fa-report-refactor
+cd <PROJECT_ROOT>
 
 # 在技能包倉庫工作
-cd /home/elan/fa-report-refactor/.agents/skills/fa-report-improvement
+cd <PROJECT_ROOT>/.agents/skills/fa-report-improvement
 
 # 兩個 git 各自獨立!commit 互不影響
 ```
@@ -91,11 +94,10 @@ fa-report-refactor/
 │   │   ├── CHANGELOG.md                ← 版本紀錄(v3.0.0 + v3.0.1)
 │   │   ├── pyproject.toml              ← 套件設定(含 [tool.pytest.ini_options])
 │   │   ├── uv.lock                     ← 依賴鎖定(51 套件)
-│   │   ├── .pre-commit-config.yaml     ← Git hooks(r / b / pytest)
-│   │   ├── .pre-commit-config.yaml     ← ruff / black / pytest 4 大類
+│   │   ├── .pre-commit-config.yaml     ← Git hooks(ruff / ruff-format / 基本檢查 / pytest)
 │   │   ├── requirements.txt            ← pip fallback(向後相容)
-│   │   ├── src/fa_improver/            ← 主程式碼(35 模組)
-│   │   ├── tests/                      ← 105 個測試
+│   │   ├── src/fa_improver/            ← 主程式碼(39 個 .py)
+│   │   ├── tests/                      ← 233 passed + 3 skipped
 │   │   ├── references/                 ← 領域知識(5 份)
 │   │   └── scripts/                    ← 向後相容 CLI 入口
 │   │
@@ -124,16 +126,23 @@ fa-report-refactor/
 7. `docs/USER_GUIDE.md` — 使用手冊(若有實際使用需求)
 8. `.agents/skills/fa-report-improvement/SKILL.md` — 技能包入口
 
-### 4.4 理解歷史決策
-9. ~~`docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md` — 8 項 v3.1+ 未完成項清單~~(已全部完成,參考 § 十一)
-10. `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md` — v3.1.3 用戶回饋 3 個版面問題修正記錄
-11. `docs/handoff/2026-09-02-fa-report-refactor-audit-handoff.md` — 柔伊 對 v3.1.2/v3.1.3 獨立稽核報告
-12. `docs/handoff/2026-09-03-audit-remediation-plan-handoff.md` — 改善計畫(Kenny 拍板)
-13. `docs/handoff/2026-09-03-pr-merge-flow-playwright-guide.md` — PR + Merge 完整流程教學(用 v3.1.4 真實截圖)
-14. v3.1.4 release: https://github.com/kcf7012/fa-report-refactor/releases/tag/v3.1.4 ⭐(最新)
-11. `docs/handoff/2026-09-01-v312-final-fixes-handoff.md` — v3.1.2 修 v3.1.1 殘留 4 大渲染問題
-12. `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md` — v3.1.1 未完成項揭露
-13. `docs/PHASE2-5_TODO.md` — 歷史任務清單(已全部 ✅ 完成,但有誠實標記的差距)
+### 4.4 ⭐ 目前進行中(最優先,先讀這兩份)
+9. `docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md` — **跨平台遷移 + 稽核修正執行計劃(P0-P7)**。專案剛從 WSL 搬到新環境,有數項現行故障未修,動手前必讀。
+10. `docs/handoff/2026-09-04-fa-report-refactor-audit-round3-handoff.md` — 第三輪獨立稽核。含 `get_title_placeholder()` 的結構性缺口(連續三輪未解)。
+
+### 4.5 理解歷史決策
+11. `docs/handoff/2026-09-02-fa-report-refactor-audit-handoff.md` — 第一輪獨立稽核(v3.1.2/v3.1.3),含降級為 backlog 的 3 項
+12. `docs/handoff/2026-09-03-audit-remediation-plan-handoff.md` — 第一輪的改善計畫(Kenny 拍板)
+13. `docs/handoff/2026-09-03-next-audit-cycle-planning.md` — 稽核週期 SOP(⚠️ 第 77 行仍指向舊 tag,計劃書 P5 會修)
+14. `docs/handoff/2026-09-04-v3.1.4-regression-fix-handoff.md` — 標題偏左回歸修正紀錄
+15. `docs/handoff/2026-09-01-v313-user-feedback-fixes-handoff.md` — v3.1.3 三個版面問題修正
+16. `docs/handoff/2026-09-01-v312-final-fixes-handoff.md` — v3.1.2 修 v3.1.1 殘留 4 大渲染問題
+17. `docs/handoff/2026-09-01-v311-incomplete-rendering-handoff.md` — v3.1.1 未完成項揭露
+18. `docs/handoff/2026-09-03-pr-merge-flow-playwright-guide.md` — PR + Merge 流程教學
+19. ~~`docs/handoff/2026-08-31-honest-phase-completion-check-handoff.md`~~(已全部完成,參考 § 十一)
+20. `docs/PHASE2-5_TODO.md` — 歷史任務清單(已完成,有誠實標記的差距)
+
+> ⚠️ `docs/handoff/` 底下多數是 WSL 時期的紀錄,內文的絕對路徑是**當時的事實**,刻意不改寫。讀它們是為了理解決策脈絡,**不要照著裡面的路徑或指令執行**。
 
 ---
 
@@ -183,10 +192,10 @@ uv run python -m fa_improver input.pptx --eval eval.json --output improved.pptx
 
 **觸發**:使用者說「code review」「幫我看程式碼」「review 一下」
 
-**🚨 絕對原則**:只給建議,**不修改**使用者代碼
+**🚨 絕對原則**:只給建議,**不修改**使用者程式碼
 - 即使發現 P0 bug、安全漏洞、lint 錯誤
 - 即使使用者說「順手修一下」
-- 例外:`docs/`、`*.md`、`handoff/` 等非代碼檔可以產生報告
+- 例外:`docs/`、`*.md`、`handoff/` 等非程式碼檔可以產生報告
 
 **7 大維度**:正確性 / 可讀性 / 可維護性 / 測試 / 安全 / 效能 / 規範
 
@@ -198,14 +207,22 @@ uv run python -m fa_improver input.pptx --eval eval.json --output improved.pptx
 
 ## 六、核心工作規則
 
-### 6.1 修改代碼前的必做事項
+### 6.0 語言
+
+- **一律使用台灣繁體中文**撰寫回覆、commit message、handoff 文檔與程式碼註解。
+- **技術術語保留英文原文,不要硬翻**。例如 placeholder、layout、fixture、commit、branch protection、coverage、lint、hook、stash、upstream、pipeline、fallback 等,直接用英文,不要譯成「佔位符」「版面配置」「基準線」之類。
+- 用台灣慣用詞,不要用中國大陸用語。常見對照:**程式碼**(非「代碼」)、**檔案**(指 file 時,非「文件」)、資料夾、記憶體、預設值、函式、變數、迴圈、字串、介面。
+- 混排時中英文之間不加空格與否維持全檔一致即可,不強制。
+
+
+### 6.1 修改程式碼前的必做事項
 
 1. **讀檔案** — 不要憑印象評價(用 `read` 工具讀完整檔案)
 2. **確認日期** — 寫日期前用 `date` 指令確認今天
-4. **檢查 git 狀態** — `git status` 確認沒有意外的變更
 3. **理解上下文** — 看相關測試與文件
+4. **檢查 git 狀態** — `git status` 確認沒有意外的變更(注意是**哪一個** repo,見 § 二)
 
-### 6.2 修改代碼後的必做事項
+### 6.2 修改程式碼後的必做事項
 
 1. **跑測試**:`cd .agents/skills/fa-report-improvement && uv run pytest tests/ -q`
 2. **檢查 ruff**:`uv run ruff check src/ scripts/ tests/`
@@ -265,7 +282,7 @@ ignore = ["E501"]  # line-too-long(交給 black)
 
 ```bash
 # 1. 在根倉庫工作(預設)
-cd /home/elan/fa-report-refactor
+cd <PROJECT_ROOT>
 git status
 git add docs/AGENTS.md
 git commit -m "docs: 加入 AGENTS.md"
@@ -277,7 +294,7 @@ git add src/ tests/
 git commit -m "feat: 新增 X 功能"
 
 # 3. 兩個倉庫各自獨立 push(若需要)
-cd /home/elan/fa-report-refactor
+cd <PROJECT_ROOT>
 git push origin main
 cd .agents/skills/fa-report-improvement
 git push origin main
@@ -323,7 +340,7 @@ git commit -m "<prefix>: <中文簡述 50 字內>" -m "<詳細說明條列>"
 ### 9.2 跑專門測試
 
 ```bash
-.venv/bin/python -m pytest tests/unit/test_master_protection.py -v
+uv run pytest tests/unit/test_master_protection.py -v
 ```
 
 **不可繞過** — 若失敗,絕對不能合併。
@@ -376,7 +393,7 @@ v3.1.0 起,OpenAI client 自動處理瞬時錯誤:
 | 🟢 P2 | `--api-key` CLI 參數 | `b5fbfba` | ✅ 完成 |
 | 🟢 P2 | `test_template_validation.py` | `9a39076` | ✅ 完成 |
 
-**成果**:測試 102 → 203(+101),覆蓋率 85% → 90%,tag `v3.1.0` 已建立。
+**成果**:測試 102 → 203(+101),tag `v3.1.0` 已建立。(當時 handoff 宣稱覆蓋率達 90%,但獨立稽核與 CI log 實測都是 85%,此處不再沿用該數字。)
 
 下一輪任務參考 `docs/handoff/` 最新交接文檔。
 
@@ -386,7 +403,7 @@ v3.1.0 起,OpenAI client 自動處理瞬時錯誤:
 
 | 問題 | 解決 |
 |------|------|
-| `ModuleNotFoundError: fa_improver` | 用 `uv run` 或 `.venv/bin/python -m` |
+| `ModuleNotFoundError: fa_improver` | 用 `uv run`(不要用 `.venv/bin/...`,那是 POSIX-only 路徑) |
 | pre-commit 卡住 | 用 `git commit --no-verify` 跳過(但要先理解為何失敗) |
 | ruff 報錯 | `uv run ruff check --fix`(自動修大部分) |
 | 母片保護測試失敗 | **絕對不能合併**,先修程式碼 |
@@ -406,6 +423,6 @@ v3.1.0 起,OpenAI client 自動處理瞬時錯誤:
 
 ---
 
-**最後更新**:2026-08-31
+**最後更新**:2026-09-05(修正 WSL 時期遺留的寫死路徑與過時數字)
 **維護者**:Kenny Kang (ELAN FA Report 專案)
 **授權**:MIT
