@@ -51,9 +51,11 @@ Kenny 確認後才會從 P0 開始執行。
 > ⚠️ **`.git/hooks/pre-commit` 是從 WSL 整份搬過來的，現在任何 `git commit` 都會失敗**（實測）
 >
 > 技能包倉庫的 `.git/hooks/pre-commit` 內容寫死：
+>
 > ```
 > INSTALL_PYTHON=/home/elan/fa-report-refactor/.agents/skills/fa-report-improvement/.venv/bin/python
 > ```
+>
 > 判斷邏輯是「`INSTALL_PYTHON` 不存在 → 退而找 PATH 上的 `pre-commit` → 都沒有就 `exit 1`」。這台 Mac 兩個條件都不成立，所以 commit 會被 hook 擋掉。
 >
 > **跑完 P0 第 4 步之後仍然是壞的** —— 路徑寫死在 hook 檔案裡，`uv sync` 不會去改它，改 `.pre-commit-config.yaml` 也不會（YAML 是設定，hook 是 `pre-commit install` 產生的腳本，兩者分開）。必須執行第 5 步重新產生。
@@ -62,14 +64,14 @@ Kenny 確認後才會從 P0 開始執行。
 
 > ⚠️ **這台 Mac 的 GitHub 帳號對兩個 repo 都沒有寫入權限**（實測，兩份計劃書都沒發現）
 >
-> | 項目 | 實測值 |
-> |---|---|
-> | `gh auth status` | 登入為 **`KennyKang7012`** |
-> | repo owner | **`kcf7012`**（不同帳號） |
-> | `gh api repos/kcf7012/fa-report-refactor` 的 permissions | `admin=false  push=false` |
-> | `git push --dry-run` | `remote: Permission to kcf7012/fa-report-refactor.git denied to KennyKang7012.` → **403** |
-> | git credential helper | `osxkeychain`（存的也是 KennyKang7012） |
-> | 本機 commit 身分 | `Kenny Kang <kenny.kang@elan.com.tw>`（repo 內 14/15 個 commit 都是這個 email） |
+> | 項目                                                     | 實測值                                                                                    |
+> | -------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+> | `gh auth status`                                         | 登入為 **`KennyKang7012`**                                                                |
+> | repo owner                                               | **`kcf7012`**（不同帳號）                                                                 |
+> | `gh api repos/kcf7012/fa-report-refactor` 的 permissions | `admin=false  push=false`                                                                 |
+> | `git push --dry-run`                                     | `remote: Permission to kcf7012/fa-report-refactor.git denied to KennyKang7012.` → **403** |
+> | git credential helper                                    | `osxkeychain`（存的也是 KennyKang7012）                                                   |
+> | 本機 commit 身分                                         | `Kenny Kang <kenny.kang@elan.com.tw>`（repo 內 14/15 個 commit 都是這個 email）           |
 >
 > **影響**：P3 的 branch protection（需要 admin）、P6 的 tag push / `gh release create`、補 `CODECOV_TOKEN` secret、甚至最基本的 `git push` 與開 PR，**從這台機器全部做不到**。
 >
@@ -83,11 +85,11 @@ Kenny 確認後才會從 P0 開始執行。
 >
 > **三套獨立機制不要混為一談**（這是當時混淆的根源）：
 >
-> | 機制 | 本機目前值 | 決定什麼 |
-> |---|---|---|
-> | `git config user.email` | global `kenny7012@gmail.com`，但兩個 repo 的 **local 都覆蓋成 `kenny.kang@elan.com.tw`** | 只決定 commit 的作者署名，**與權限無關** |
-> | credential（osxkeychain） | username = `14908981` = `KennyKang7012` | 決定 `git push` 的身分 —— 403 的真正來源 |
-> | GitHub 協作者／擁有者 | repo 屬於 `kcf7012`（id 73571535） | 決定誰能 push、誰能設 branch protection |
+> | 機制                      | 本機目前值                                                                               | 決定什麼                                 |
+> | ------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- |
+> | `git config user.email`   | global `kenny7012@gmail.com`，但兩個 repo 的 **local 都覆蓋成 `kenny.kang@elan.com.tw`** | 只決定 commit 的作者署名，**與權限無關** |
+> | credential（osxkeychain） | username = `14908981` = `KennyKang7012`                                                  | 決定 `git push` 的身分 —— 403 的真正來源 |
+> | GitHub 協作者／擁有者     | repo 屬於 `kcf7012`（id 73571535）                                                       | 決定誰能 push、誰能設 branch protection  |
 >
 > `kcf7012`（id 73571535）與 `KennyKang7012`（id 14908981，2015 建立）是**兩個不同的 GitHub 帳號**。在 GitHub「Add people」填 email，只有當該 email 是某帳號的「已驗證 email」時才會解析成帳號。
 >
@@ -97,12 +99,12 @@ Kenny 確認後才會從 P0 開始執行。
 
 Kenny 確認專案是從 WSL **整個目錄拷貝**過來的，所以 `.git/` 內部狀態（含 repo-local config 與已安裝的 hook）全部沿用 WSL 那台。實測掃描結果：
 
-| repo | 遺留物 | 後果 | 修法 |
-|---|---|---|---|
-| skill | `.git/hooks/pre-commit` 寫死 `/home/elan/...` | **`git commit` 直接失敗** | P0 第 5 步 `uv run pre-commit install` |
+| repo  | 遺留物                                                                                                                                          | 後果                                                          | 修法                                            |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| skill | `.git/hooks/pre-commit` 寫死 `/home/elan/...`                                                                                                   | **`git commit` 直接失敗**                                     | P0 第 5 步 `uv run pre-commit install`          |
 | skill | **`main` 沒有 upstream 追蹤** —— `[branch "main"]` 只剩 `vscode-merge-base = origin/main`（VS Code 殘骸），正式的 `remote` / `merge` 兩行不存在 | `git pull` 在 main 上 fatal；`git status` 不顯示 ahead/behind | `git branch --set-upstream-to=origin/main main` |
-| skill | 本地分支 `v3.1.4-audit-fixes` 追蹤的遠端分支**已刪除**（遠端只剩 `main` 與 `v3.1.4-regression-fix`） | 孤兒分支 | `git fetch --prune` 後刪除已合併的本地分支 |
-| 兩者 | repo-local `user.email = kenny.kang@elan.com.tw`（**Kenny 確認這是 Pi Agent 當時設錯的位址**）蓋掉 Mac 的 global `kenny7012@gmail.com` | 兩個 repo 共 **59 個 commit** 在 GitHub 上未連結任何帳號 | 只改未來，不動歷史 —— 見下方「commit 署名」 |
+| skill | 本地分支 `v3.1.4-audit-fixes` 追蹤的遠端分支**已刪除**（遠端只剩 `main` 與 `v3.1.4-regression-fix`）                                            | 孤兒分支                                                      | `git fetch --prune` 後刪除已合併的本地分支      |
+| 兩者  | repo-local `user.email = kenny.kang@elan.com.tw`（**Kenny 確認這是 Pi Agent 當時設錯的位址**）蓋掉 Mac 的 global `kenny7012@gmail.com`          | 兩個 repo 共 **59 個 commit** 在 GitHub 上未連結任何帳號      | 只改未來，不動歷史 —— 見下方「commit 署名」     |
 
 **其餘都乾淨**：remote URL 正確、`core.filemode = true`（macOS 正確值）、無 `core.hooksPath`、無 LFS filter、無 credential 覆寫。root repo 的 `main` upstream 追蹤正常。
 
@@ -121,10 +123,10 @@ WIP on v3.1.4-regression-fix: 5cb68a4 chore(pre-commit): 升級 ruff-pre-commit 
 
 **但有佐證價值，與 P4 直接相關**：
 
-| | margin 表達式 | 實際值 | 與裝飾區的緩衝 |
-|---|---|---|---|
-| stash（第一版嘗試） | `TITLE_SAFE_LEFT_INCH` | **1.2** | 0.23 in |
-| 實際上線（`eb9afe3`+`5db2b5a`） | `TITLE_SAFE_LEFT_INCH - 0.2` | **1.0** | 0.03 in |
+|                                 | margin 表達式                | 實際值  | 與裝飾區的緩衝 |
+| ------------------------------- | ---------------------------- | ------- | -------------- |
+| stash（第一版嘗試）             | `TITLE_SAFE_LEFT_INCH`       | **1.2** | 0.23 in        |
+| 實際上線（`eb9afe3`+`5db2b5a`） | `TITLE_SAFE_LEFT_INCH - 0.2` | **1.0** | 0.03 in        |
 
 稽核報告第 7 節指「上一輪 `TITLE_SAFE_LEFT_INCH - 0.2` 這個數字是為了讓既有測試通過而反推出來的」。這筆 stash 的存在與該說法一致：**最初採用的是與常數對齊的 1.2，之後才退成 1.0**。
 
@@ -136,27 +138,29 @@ WIP on v3.1.4-regression-fix: 5cb68a4 chore(pre-commit): 升級 ruff-pre-commit 
 
 **背景**：三個 Gmail／信箱一度被混為一談，釐清如下——
 
-| 位置 | 值 | 說明 |
-|---|---|---|
-| kcf7012 GitHub 主要信箱 | `kcf7012@gmail.com`（Primary / Verified / **Private**） | 帳號唯一的驗證信箱 |
-| Mac global git config | `kenny7012@gmail.com` | **與上者差一個字，是不同位址**；先前協作者設定沒生效多半源於此 |
-| 兩個 repo 的 local git config | `kenny.kang@elan.com.tw` | **設錯的位址**（Pi Agent 當時的設定失誤），無法驗證 |
+| 位置                          | 值                                                      | 說明                                                           |
+| ----------------------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
+| kcf7012 GitHub 主要信箱       | `kcf7012@gmail.com`（Primary / Verified / **Private**） | 帳號唯一的驗證信箱                                             |
+| Mac global git config         | `kenny7012@gmail.com`                                   | **與上者差一個字，是不同位址**；先前協作者設定沒生效多半源於此 |
+| 兩個 repo 的 local git config | `kenny.kang@elan.com.tw`                                | **設錯的位址**（Pi Agent 當時的設定失誤），無法驗證            |
 
 kcf7012 的兩個相關開關已實際確認（2026-09-05 截圖）：
 
-| 設定 | 狀態 | 意義 |
-|---|---|---|
-| Keep my email addresses private | **On** | web-based Git operations 一律用 `73571535+kcf7012@users.noreply.github.com` |
-| Block command line pushes that expose my email | **Off** | 不會出現 `GH007: Your push would publish a private email address` |
+| 設定                                           | 狀態    | 意義                                                                        |
+| ---------------------------------------------- | ------- | --------------------------------------------------------------------------- |
+| Keep my email addresses private                | **On**  | web-based Git operations 一律用 `73571535+kcf7012@users.noreply.github.com` |
+| Block command line pushes that expose my email | **Off** | 不會出現 `GH007: Your push would publish a private email address`           |
 
 因此 **GH007 不是風險**。改署名的理由單純是「現在這個位址是錯的」，不是為了規避推送阻擋。
 
 **決定**：
+
 ```bash
 # root repo 與 skill repo 各執行一次
 git config user.name  "Kenny Kang"
 git config user.email "73571535+kcf7012@users.noreply.github.com"
 ```
+
 未來 commit 歸屬 `kcf7012`，並與帳號既有的隱私設定一致。
 
 **明確不做：改寫歷史**。曾評估「把設錯的 email 加進 GitHub verified emails 以回溯連結 59 個 commit」，但該位址無法驗證，此路不通。改用 `git filter-repo` 重寫作者的代價則完全不成比例：59 個 commit 全部換 SHA、兩個 repo 都要 force-push、已發布的 `v3.1.4` Release 指向的 `5cb68a4` 失效、稽核報告與各份 handoff 引用的 SHA（`f2118cf`／`b071b00`／`eb9afe3`／`5db2b5a`…）全變死引用。歷史 commit 顯示灰頭像、不計入貢獻圖，是**純外觀**問題。
@@ -167,24 +171,24 @@ git config user.email "73571535+kcf7012@users.noreply.github.com"
 
 `kenny.kang@elan.com.tw` 不只在 git config，還散在套件 metadata 與文件裡。掃描結果（不含 `docs/handoff/` 歷史紀錄與本計劃書自身的引述）：
 
-| 位置 | 性質 | 歸屬階段 |
-|---|---|---|
-| root repo `.git/config` → `user.email` | 本機設定，未追蹤 | **P0**（改 noreply） |
-| skill repo `.git/config` → `user.email` | 本機設定，未追蹤 | **P0**（改 noreply） |
-| `.agents/skills/fa-report-improvement/pyproject.toml:9` `authors` | **會被打包發布的套件 metadata** | **P5**（需 commit） |
-| `docs/08_uv_integration.md:53` | 文件內的 pyproject 範例 | **P5** |
-| `docs/10_api_reference.md:543` | 維護者聯絡資訊 | **P5** |
+| 位置                                                              | 性質                            | 歸屬階段             |
+| ----------------------------------------------------------------- | ------------------------------- | -------------------- |
+| root repo `.git/config` → `user.email`                            | 本機設定，未追蹤                | **P0**（改 noreply） |
+| skill repo `.git/config` → `user.email`                           | 本機設定，未追蹤                | **P0**（改 noreply） |
+| `.agents/skills/fa-report-improvement/pyproject.toml:9` `authors` | **會被打包發布的套件 metadata** | **P5**（需 commit）  |
+| `docs/08_uv_integration.md:53`                                    | 文件內的 pyproject 範例         | **P5**               |
+| `docs/10_api_reference.md:543`                                    | 維護者聯絡資訊                  | **P5**               |
 
 > ⚠️ 已建置的產出物也烙進去了：`dist/fa_improver-3.1.0-py3-none-any.whl` 的 METADATA 含 `Author-email: Kenny Kang <kenny.kang@elan.com.tw>`。CI 每次推 main 都會重新建置並上傳 artifact，所以改完 `pyproject.toml` 後產出物會自動更新；本機 `dist/` 那兩個舊檔在 P0 第 2 步一併清掉。
->
+
 **兩種用途用不同的值**（Kenny 2026-09-05 拍板）：
 
-| 用途 | 值 | 理由 |
-|---|---|---|
-| git commit 署名（兩個 repo 的 `.git/config`） | `73571535+kcf7012@users.noreply.github.com`，name 維持 `Kenny Kang` | 機器可讀，未來 commit 連結到 `kcf7012`；符合帳號的 private email 設定 |
-| `pyproject.toml` `authors` | **只留名字，拿掉 email**：`authors = [{ name = "Kenny Kang" }]`（PEP 621 允許） | 不在 public repo 與每一份 wheel 的 METADATA 裡曝露任何信箱 |
-| `docs/10_api_reference.md:543` 維護者資訊 | 改為 `Kenny Kang`，聯絡管道寫「問題回報請開 GitHub Issue」 | 同上；GitHub Issues 本來就是實際的聯絡管道 |
-| `docs/08_uv_integration.md:53` | 同步更新該處的 pyproject 範例 | 範例要與實際檔案一致 |
+| 用途                                          | 值                                                                              | 理由                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| git commit 署名（兩個 repo 的 `.git/config`） | `73571535+kcf7012@users.noreply.github.com`，name 維持 `Kenny Kang`             | 機器可讀，未來 commit 連結到 `kcf7012`；符合帳號的 private email 設定 |
+| `pyproject.toml` `authors`                    | **只留名字，拿掉 email**：`authors = [{ name = "Kenny Kang" }]`（PEP 621 允許） | 不在 public repo 與每一份 wheel 的 METADATA 裡曝露任何信箱            |
+| `docs/10_api_reference.md:543` 維護者資訊     | 改為 `Kenny Kang`，聯絡管道寫「問題回報請開 GitHub Issue」                      | 同上；GitHub Issues 本來就是實際的聯絡管道                            |
+| `docs/08_uv_integration.md:53`                | 同步更新該處的 pyproject 範例                                                   | 範例要與實際檔案一致                                                  |
 
 > 掃描注意事項：Claude Code 的 shell 內 `grep` 是包裝函式且預設 `--exclude-dir=.git`，用 `grep -r` 掃 `.git/` 會**靜默回傳空結果**。要掃 `.git/` 必須用 `find .git -type f -exec command grep -l ... {} +`。
 
@@ -235,13 +239,13 @@ def resolve_report_file(name) -> Path | None
 
 > **P1 是在補完第一輪稽核那個做了一半的修正**（`docs/handoff/2026-09-02-fa-report-refactor-audit-handoff.md` 發現 #2）：
 >
-> | 時間 | 狀態 |
-> |---|---|
-> | 第一輪（09-02） | 抓到 16 個測試寫死 `PROJECT_ROOT = Path("/home/elan/fa-report-refactor")` |
-> | 修法 | 改用 `_fixture_resolver.py` —— **但把 `/home/elan/...` 原封不動搬進去當 `_DEFAULT_ROOTS` 第一順位** |
-> | 第二、三輪稽核 | 柔伊從乾淨 clone 稽核，兩個候選路徑都不存在 → fallback 合成 fixture → 測試有跑 → **看起來是修好的** |
-> | Pi Agent 的 WSL | `/home/elan/...` 存在 → 跑真實客戶檔 → 也正常 |
-> | **這台 Mac** | 真實客戶檔在 `/Users/kennykang/...`，resolver 不認得 → **靜默降級** |
+> | 時間            | 狀態                                                                                                |
+> | --------------- | --------------------------------------------------------------------------------------------------- |
+> | 第一輪（09-02） | 抓到 16 個測試寫死 `PROJECT_ROOT = Path("/home/elan/fa-report-refactor")`                           |
+> | 修法            | 改用 `_fixture_resolver.py` —— **但把 `/home/elan/...` 原封不動搬進去當 `_DEFAULT_ROOTS` 第一順位** |
+> | 第二、三輪稽核  | 柔伊從乾淨 clone 稽核，兩個候選路徑都不存在 → fallback 合成 fixture → 測試有跑 → **看起來是修好的** |
+> | Pi Agent 的 WSL | `/home/elan/...` 存在 → 跑真實客戶檔 → 也正常                                                       |
+> | **這台 Mac**    | 真實客戶檔在 `/Users/kennykang/...`，resolver 不認得 → **靜默降級**                                 |
 >
 > 修正把「硬編路徑」從測試檔**搬家**到 resolver，沒有真正消除。而且失效方式從「19 skipped」（看得見）變成「測試照跑照過、只是資料變弱」（看不見）—— 比原本更難察覺。三輪稽核都沒抓到，是因為沒有任何一輪跑在「真實客戶檔存在、但路徑不同」的機器上。這正是本次遷移才暴露出來的。
 
@@ -315,13 +319,13 @@ def resolve_report_file(name) -> Path | None
 
 **建議設定值**（帳號問題解決後）：
 
-| 欄位 | 值 | 理由 |
-|---|---|---|
-| `required_status_checks.contexts` | `Lint & Format`、`Test (ubuntu-latest / Python 3.10)`、`Test (macos-latest / Python 3.10)`、`Pre-commit` | 對應 P3 第 1、2 步改完後的 job 名稱 |
-| `required_status_checks.strict` | `true` | 分支需與 main 同步後才能合併 |
-| `required_pull_request_reviews.required_approving_review_count` | **`0`** | 單人維護，設 1 會鎖死自己（Codex 的提醒） |
-| `enforce_admins` | `true` | 若設 `false`，admin 可以繞過全部規則 —— 那就退回「靠記得」，等於沒做 |
-| `allow_force_pushes` / `allow_deletions` | `false` | — |
+| 欄位                                                            | 值                                                                                                       | 理由                                                                 |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `required_status_checks.contexts`                               | `Lint & Format`、`Test (ubuntu-latest / Python 3.10)`、`Test (macos-latest / Python 3.10)`、`Pre-commit` | 對應 P3 第 1、2 步改完後的 job 名稱                                  |
+| `required_status_checks.strict`                                 | `true`                                                                                                   | 分支需與 main 同步後才能合併                                         |
+| `required_pull_request_reviews.required_approving_review_count` | **`0`**                                                                                                  | 單人維護，設 1 會鎖死自己（Codex 的提醒）                            |
+| `enforce_admins`                                                | `true`                                                                                                   | 若設 `false`，admin 可以繞過全部規則 —— 那就退回「靠記得」，等於沒做 |
+| `allow_force_pushes` / `allow_deletions`                        | `false`                                                                                                  | —                                                                    |
 
 > `required_approving_review_count: 0` 仍然強制「必須開 PR、CI 必須綠」才能合併，這已經能擋掉連兩輪發生的「衝突標記沒清乾淨直接 push main」。**reviewer 那一項是唯一因為單人維護而必須放棄的**，要在文件裡誠實寫明這個取捨，不要宣稱流程防呆已經完整。
 
@@ -550,6 +554,18 @@ layout 名稱取決於**建立該 pptx 的 PowerPoint UI 語言**。zh-TW 是「
 - **改寫 `docs/handoff/` 的 20+ 份歷史交接文件** —— 那是當時環境的事實紀錄
 - **自動截圖比對**（SOP §8 的 backlog）—— 維持「v3.1.5 不做」的原判斷
 - **不動已發布的 v3.1.4 tag/Release** —— 歷史保持誠實，新東西進 v3.1.5
+
+## 柔伊複查更新（2026-09-05 深夜，派 sub-agent 獨立查證後）
+
+整體結論：**查證方式包含實際執行程式碼、查即時 GitHub API、調實際 CI log，不只是讀文件——絕大多數具體事實（檔案內容、行號、git 狀態、CI 數字）精確命中，沒有邏輯性錯誤，可以直接照這份執行。** 以下是查證後建議在動手時一併處理的幾點：
+
+1. **P4 的 `_effective_left(ph)` 可能不用手刻。** 追進 python-pptx 原始碼並用真實客戶檔實測確認：`ph.left`/`ph.width`（`_InheritsDimensions` mixin）本身就內建「本層沒設定就往 layout 再往 master 找」的繼承解析，直接讀就能拿到正確值。動手前先試 `ph.left is not None` 判斷 + 直接讀 `ph.left`/`ph.width` 能不能取代整個提案中的 helper，省一個函式跟一份對應測試。
+2. **「兩個 repo 共 59 個 commit 用錯信箱」這個數字是錯的**，實測 skill repo 55 個 + root repo 47 個（main 分支），合計 102 個，不是 59（含所有分支是 104）。不影響「不改寫歷史」這個結論，但寫進 CHANGELOG 或任何對外文件前先用實際數字，不要照抄。
+3. **幾處行號有 1-2 行誤差**（不影響邏輯，寫程式碼時以實際檔案為準）：`analysis_method.py` 的使用處是 `:56` 不是 `:54`；WSL `*:Zone.Identifier` 殘留檔實測 10 個不是 11 個；CI workflow 的 job 名稱那行是 `:56` 不是 `:57`。
+4. **執行 P0 前，兩個 repo 各自重新跑一次 `git config --local user.email` 確認現況，不要假設兩個都還是錯的。** 查證當下發現 **root repo（`fa-report-refactor-root`）的 local email 已經是對的**（`73571535+kcf7012@users.noreply.github.com`，檔案 mtime 2026-09-05 05:17，早於這輪查證）——可能是先前哪個步驟已經順手改掉了。目前只確認 **skill repo** 還是錯的（`kenny.kang@elan.com.tw`），root repo 那條指令直接跑會是 no-op，不用擔心跑錯，但心裡要有數這不是「兩邊都還沒動」的乾淨起點。
+5. **補一句 P0-P6 的相依關係，避免誤判整條路都被 GitHub 帳號問題卡住**：P0 的環境重建/hook 修復、P1 路徑 resolver、P2 工具鏈對齊、P4 標題缺口修正、P5 文件更新，這幾項**只需要本機 `git commit`，不需要 push 權限，帳號問題解決前就可以正常推進**。只有 **P3 第 5 步（branch protection，需要 admin）跟整個 P6（tag push / release / secret）** 卡在帳號問題上。不要因為看到 P0 那段帳號警告就以為整個計劃要等帳號解決才能開始。
+
+---
 
 ## 風險
 
