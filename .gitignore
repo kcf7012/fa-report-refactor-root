@@ -79,14 +79,10 @@ report/*_smoke_dyn.pptx
 report/*_improved_v2.pptx
 
 # visual_quality test 產物(由 tests/integration/test_visual_quality.py 生成)
-# 給 _run_improvement() 用的 output_suffix,如 _vqrot/_vqres/_vqtit/_vqsafe/_vqbody/_vqdim/_vqdim_optin
-report/*_vqrot.pptx
-report/*_vqres.pptx
-report/*_vqtit.pptx
-report/*_vqsafe.pptx
-report/*_vqbody.pptx
-report/*_vqdim.pptx
-report/*_vqdim_optin.pptx
+# 給 _run_improvement() 用的 output_suffix 一律以 _vq 開頭。
+# 原本是一個 suffix 一行列舉,新增測試時必漏 —— P4 加了三支測試就漏了三個
+# (_vqphleft / _vqdecov / _vqbodydec),污染根倉庫的 git status。改用萬用字元。
+report/*_vq*.pptx
 
 # 視覺驗證腳本產物(由 scripts/visual_smoke_test.py 生成)
 # 既有 v3.1.2 改善檔的視覺驗證圖,以「_improved_visual」結尾的目錄
