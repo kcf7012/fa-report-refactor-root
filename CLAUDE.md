@@ -15,42 +15,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## ⚠️ 這個 repo 正在從 WSL 遷移到 macOS,尚未完成
+## 跨平台遷移狀態(WSL → macOS + CI/CD 強化)
 
-專案原本在 Windows WSL(`/home/elan/fa-report-refactor/`)開發,整個目錄被**複製**(不是 clone)到目前的 macOS 路徑。因此有幾件事現在是壞的: <!-- allow-abs-path -->
+專案原本在 WSL 開發,2026-09-05 起分階段遷移到 macOS 並強化 CI/CD(計劃書 P0-P7)。
+**P0-P3 已完成並在遠端 CI 驗證過**(venv 重建、路徑解析改為 `fa_improver.paths`
+統一事實來源、工具鏈版本三處對齊、macOS runner + pre-commit job + branch protection)。
 
-| 現況 | 影響 |
-|---|---|
-| `.agents/skills/fa-report-improvement/.venv/` 是 Linux x86-64 ELF | `.venv/bin/python` 執行會 `exec format error`,連 `uv sync` 都被擋住 |
-| 技能包 `.git/hooks/pre-commit` 寫死 WSL 路徑 | **該 repo 任何 `git commit` 都會失敗**;需 `uv run pre-commit install` 重新產生 |
-| `tests/integration/_fixture_resolver.py` 硬編 `/home/elan/...` <!-- allow-abs-path --> | 真實客戶 pptx 存在卻找不到 → 16 個視覺回歸測試**靜默降級**跑合成 fixture(不報錯、不 skip) |
-| 技能包 `.git/config` 的 `user.email` 是不存在的位址 | commit 署名錯誤 |
-| 技能包 `main` 沒有 upstream 追蹤 | `git pull` 會 fatal |
+**不要在這裡找「目前進度」的快照 —— 上一版就是活生生的教訓:整段四句話全錯,
+而那是新 session 開場第一個讀到的檔。** 這類表格必然過期,改用指令自己看:
 
-**完整的遷移與修正計劃在 `docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md`(P0-P7)。動手前先讀它**,不要自己重新發明修法。
+```bash
+# 兩個 repo 是否有未推的 commit
+cd <PROJECT_ROOT>                                      && git log --oneline origin/main..HEAD
+cd <PROJECT_ROOT>/.agents/skills/fa-report-improvement && git log --oneline origin/main..HEAD
 
-### 目前進度(2026-09-05)
+# CI 現況
+gh run list --repo kcf7012/fa-report-refactor --limit 5
+gh run list --repo kcf7012/fa-report-refactor-root --limit 5
+```
 
-| 項目 | 狀態 |
-|---|---|
-| 計劃書 | 已完成並經獨立複查,**Kenny 審閱中,尚未授權執行** |
-| P0-P7 | **全部尚未開始**,程式碼一行未改 |
-| 根倉庫 | 有數個 commit 在本地 `main`,**未 push** |
-| 技能包倉庫 | 完全未動,HEAD 與 `origin/main` 同步 |
+- 完整計劃與任務拆解:`docs/handoff/2026-09-05-cross-platform-migration-plan-handoff.md`(P0-P7)
+- 每一輪的獨立查證:`docs/handoff/2026-09-05-zoe-verification-*.md`,依檔名日期由舊到新讀;
+  每份的「給 Claude Code 的指示」一節通常就是下一步待辦
 
-> 接手時先跑 `git log --oneline origin/main..HEAD` 與 `git status` 確認實際狀態,不要以本表為準——這行字會過時。
-> **未經 Kenny 明確指示不要開始執行 P0,也不要 push。**
+### branch protection(兩個 repo 規則不同,2026-09-05 拍板)
 
-### AGENTS.md 有已知錯誤,不要照抄
+| repo | `enforce_admins` | 直推 main |
+|---|---|---|
+| 技能包(`fa-report-refactor`) | `true` | ❌ 必須走 PR |
+| 根倉庫(`fa-report-refactor-root`) | `false` | ✅ 可以 |
 
-`AGENTS.md` 是 WSL 時期寫的,以下內容**目前是錯的**(計劃書 P5 會修):
+理由:技能包是要交付給別的 agent 使用的產品,嚴一點是對的。根倉庫是單人維護、
+高頻小改的文件倉庫,強制自己開 PR 自己核准是演戲,反而會養成「無腦點過」的習慣。
+兩個 repo 都設了 `allow_force_pushes=false`、`allow_deletions=false`
+——這兩項防呆與 `enforce_admins` 無關,根倉庫放寬 review 不影響它們。
+數值可能再調整,用 `gh api repos/kcf7012/<repo>/branches/main/protection` 確認現況,
+不要憑這張表的印象行動。
 
-- 所有 `cd /home/elan/fa-report-refactor` 指令(`:50,53,268,280`) <!-- allow-abs-path -->
-- `:20` 宣稱 uv 0.12.7+(v3.1.5 起本機與 CI 都是 0.8.22)
-- `:23,95` 宣稱有 black(`.pre-commit-config.yaml` 已停用)
-- `:326` 的 `.venv/bin/python`(改用 `uv run`)
+### AGENTS.md 可能有過時內容
 
-其餘規則(母片保護、雙倉庫 commit 流程、Conventional Commit 格式)仍然有效。
+`AGENTS.md` 是 WSL 時期寫的舊文件。**不要假設它記載的環境細節(版本號、路徑、
+工具鏈選擇)是對的**——這幾輪已經修正過好幾次,但只要沒人盯著就會再飄,曾經同一批
+「已知錯誤」清單本身就在後續某次修正後變成過期清單。有疑問時以程式碼、
+`pyproject.toml`、`.github/workflows/` 為準,不要照抄看起來像規則的敘述文字而不驗證。
+母片保護、雙倉庫 commit 流程、Conventional Commit 格式這些**規則性**內容不受此影響,
+仍然有效。
 
 ---
 
@@ -91,18 +100,29 @@ chflags -R nohidden .        # 在專案根目錄執行,然後重試 commit
 這是**正常的**,不是程式壞掉 —— 那支測試就是設計來讓這個故障可見的
 (在此之前它是隱形的:測試全綠但 CLI 壞掉)。
 
-### 建議的根治(擇一,都需要 Kenny 決定)
+### 根治方案(2026-09-05 拍板:直接搬離 iCloud)
 
-1. **把 venv 移出 iCloud**(15 分鐘,程式碼零修改):
-   `export UV_PROJECT_ENVIRONMENT="$HOME/.venvs/fa-report-improvement"` 寫進 `~/.zshrc`,
-   之後 `uv sync` 會把 venv 建在外部,專案目錄下不再產生 `.venv`。
-   一次解決 CLI 失效與 commit 被擋,並少掉近半的 hidden 檔。
-   **但治不了 `.git/` 仍在同步範圍內**這個最大風險。
-2. **把整個專案搬出 `~/Desktop`**(例如 `~/Projects/`)—— 真正的根治。
-   P1 已把程式碼路徑全部動態化,搬完**程式碼不用改**,只需重建 venv 與
-   `pre-commit install`(這兩者內含絕對路徑)。
+`UV_PROJECT_ENVIRONMENT` 環境變數方案**已評估後否決**:它只能靠 `direnv` 之類
+機制注入,而 `direnv` 掛在 shell 的提示符事件上,只有互動式終端機會觸發。
+Claude Code 執行指令、pre-commit hook 跑測試用的都是非互動式 shell,根本不會
+觸發 —— 環境變數沒設,`uv` 就退回在專案內重建 `.venv`,等於白搬而且是**靜默
+失敗**,直到 CLI 又壞掉才會發現。`uv` 也沒有任何 `pyproject.toml`/`uv.toml`
+層級的等價設定,只吃環境變數,所以不存在對所有呼叫路徑都可靠的專案級寫法。
 
-完整證據與排查過程:`docs/handoff/2026-09-05-execution-findings-for-zoe-handoff.md` 發現 2。
+**決定:把整個專案搬出 `~/Desktop`**(例如 `~/Projects/`)。技術前提已具備:
+技能包 tracked 檔裡零個寫死目前絕對路徑(P1 的成果),根倉庫僅 2 個(皆為
+handoff 文件的敘述文字,不影響功能)——**搬完程式碼不用改**,只需:
+
+```bash
+uv sync --locked --extra dev --extra llm   # 舊 .venv 的 pyvenv.cfg / bin/ shebang 都寫死絕對路徑,不能直接搬
+uv run pre-commit install                   # hook 的 INSTALL_PYTHON 也寫死舊路徑
+```
+
+搬家由 Kenny/柔伊主導執行,Claude Code 不要自己動手 `mv`。
+
+完整證據與排查過程:`docs/handoff/2026-09-05-execution-findings-for-zoe-handoff.md` 發現 2;
+否決 `UV_PROJECT_ENVIRONMENT` 的完整技術理由:
+`docs/handoff/2026-09-05-zoe-verification-round7-p3-ci.md` 第 6 節第 8 項。
 
 ---
 
@@ -204,6 +224,12 @@ FA 報告含公司機密(Logo、機密等級標示、部門色系)。`layout/pro
 - **驗收要包含「我聲稱修改的檔案,是否真的都在 diff 裡」。** 用 `git show --name-only`
   或 `git diff --name-only` 對照自己列的待辦清單。連續兩輪敗在同一個地方:**改了一部分
   就宣告「一律」**(AGENTS.md 那次、README badge 那次)。
+- **對「時效性證據」(會被覆寫、刪除、重新產生的檔案狀態)下判定時,只能寫「無法驗證」,
+  不能寫「不實」。** 要下「不實」必須有正面反證,不能只憑「我重現不出來」——證據消失
+  不代表證據不存在過。反例:曾把一份 mtime 觀測記錄誤判為「不實」,後來被證明原始觀測
+  沒錯,只是同名檔案已被另一批取代;過度延伸推論比不下判斷更糟。
+  見 `docs/handoff/2026-09-05-zoe-verification-p0p2-execution.md` 與
+  `docs/handoff/2026-09-05-zoe-verification-round6-redflag-fixes.md` 第 4 節。
 - **Handoff 文檔**:`docs/handoff/<YYYY-MM-DD>-<task-slug>-handoff.md`。寫日期前用 `date` 確認今天,不要沿用文件裡的舊日期。
 - **版本號**:改版時 `pyproject.toml` + `src/fa_improver/__init__.py` + `SKILL.md` frontmatter 三處必須同步(四個 README 也常漏,見計劃書 P6)。
 - 型別提示用 Python 3.10+ 語法(`list[X]`、`X | None`)。
