@@ -97,20 +97,41 @@ fa-report-refactor/
 
 ### Commit 流程
 
+兩個 repo 的 `main` 都設了 branch protection,但規則不同(2026-09-05 拍板,
+見 `CLAUDE.md` 「branch protection」一節):
+
 ```bash
-# 1. 根倉庫(文件、改善後報告)
-cd /home/elan/fa-report-refactor
+# 1. 根倉庫(文件、改善後報告)—— 未強制 PR,可以直推
+cd <PROJECT_ROOT>
 git add docs/ report/ README.md
 git commit -m "docs: 加 v3.1.3 交接文檔與最新改善報告"
+git push origin main
 
-# 2. 技能包倉庫(程式碼、測試)
+# 2. 技能包倉庫(程式碼、測試)—— 強制走 PR,直推會被拒絕
 cd .agents/skills/fa-report-improvement
 git add src/ tests/ CHANGELOG.md
+git checkout -b fix/some-topic
 git commit -m "fix: 修 Kenny 回饋的 3 個版面問題"
-
-# 3. Push
-git push origin main  # 兩個倉庫各自獨立 push
+git push -u origin fix/some-topic
+gh pr create --fill
+# 等 required checks(Lint & Format / Pre-commit / 六個 Test job)全綠後合併
+gh pr merge --auto
 ```
+
+**為什麼兩邊不一樣**:技能包是要交付給別的 agent 使用的產品,嚴一點是對的。
+根倉庫是單人維護、高頻小改的文件倉庫,強制自己開 PR 自己核准是演戲,反而會
+養成「無腦點過」的習慣。兩邊都設了 `required_approving_review_count: 0`
+——這是單人維護的必要取捨,設 1 會鎖死自己(自己不能核准自己的 PR)。
+**這條稽核建議「至少一次 review」這輪沒有完整落實,誠實記錄而非假裝做到。**
+
+`allow_force_pushes=false`、`allow_deletions=false` 兩邊都生效,與是否走 PR
+無關 —— 不走 PR 不代表沒有防呆。
+
+**緊急情況**:預設**不留後門**。技能包的 `enforce_admins=true` 沒有內建繞過
+機制,真的卡住(例如 CI 平台本身故障、required check 名稱因改 workflow
+而對不上)時,唯一路徑是 `gh api -X DELETE repos/kcf7012/fa-report-refactor/branches/main/protection`
+暫時解除、推送、**立刻用同樣的設定值補回**,並在下一個 commit 或 PR
+description 裡寫明原因。這是刻意留下稽核軌跡的做法,不是常態流程。
 
 ---
 

@@ -292,13 +292,39 @@ cd .agents/skills/fa-report-improvement
 git status
 git add src/ tests/
 git commit -m "feat: 新增 X 功能"
+```
 
-# 3. 兩個倉庫各自獨立 push(若需要)
+### 8.1.1 兩個 repo 的 push 規則不一樣(2026-09-05 拍板)
+
+`main` 都設了 branch protection,但寬嚴不同:
+
+| repo | `enforce_admins` | 直推 main |
+|---|---|---|
+| 根倉庫(`fa-report-refactor-root`) | `false` | ✅ 可以 |
+| 技能包(`fa-report-refactor`) | `true` | ❌ 必須走 PR |
+
+```bash
+# 根倉庫:直推
 cd <PROJECT_ROOT>
 git push origin main
+
+# 技能包:強制 PR,直推會被 GitHub 拒絕(remote rejected)
 cd .agents/skills/fa-report-improvement
-git push origin main
+git checkout -b feat/some-topic
+git push -u origin feat/some-topic
+gh pr create --fill
+gh pr merge --auto   # 等 required checks 全綠後合併
 ```
+
+**取捨**:兩邊 `required_approving_review_count` 都設 `0`——單人維護,設 1
+會鎖死自己(自己不能核准自己的 PR)。**「至少一次 review」這條稽核建議這輪
+沒有完整落實,這裡誠實記錄,不宣稱流程防呆已經完整。** `allow_force_pushes`
+與 `allow_deletions` 兩邊都是 `false`,不受 `enforce_admins` 影響。
+
+**緊急情況**:預設不留後門。技能包若真的卡住(CI 平台故障、required check
+名稱因改 workflow 對不上),走 `gh api -X DELETE .../protection` 暫時解除、
+推送、**立刻補回同樣設定**,並在後續 commit/PR 說明原因——這是刻意留稽核
+軌跡,不是常態流程。
 
 ### 8.2 Conventional Commit 格式
 
